@@ -51,7 +51,7 @@ docker run -i --rm \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     ${JOB_NAME}:test npm run jenkins
 docker run -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine sonar-scanner \
-  -Dsonar.host.url=https://sonar.softwaregroup-bg.com/ \
+  -Dsonar.host.url=https://sonar.softwaregroup.com/ \
   -Dsonar.projectKey=${UT_MODULE} \
   -Dsonar.projectName=${UT_MODULE} \
   -Dsonar.projectVersion=1 \
@@ -76,8 +76,8 @@ COPY --from=${JOB_NAME}:prod /app /app
 WORKDIR /app
 CMD ["node", "index.js"]
 EOF
-    echo "$DOCKER_PSW" | docker login -u "$DOCKER_USR" --password-stdin nexus-dev.softwaregroup-bg.com:5001
-    docker tag ${JOB_NAME} nexus-dev.softwaregroup-bg.com:5001/ut/${JOB_NAME}:latest
-    docker push nexus-dev.softwaregroup-bg.com:5001/ut/${JOB_NAME}:latest
-    docker rmi ${JOB_NAME}:prod ${JOB_NAME} nexus-dev.softwaregroup-bg.com:5001/ut/${JOB_NAME}:latest
+    echo "$DOCKER_PSW" | docker login -u "$DOCKER_USR" --password-stdin nexus-dev.softwaregroup.com:5001
+    docker tag ${JOB_NAME} nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
+    docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
+    docker rmi ${JOB_NAME}:prod ${JOB_NAME} nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
 fi

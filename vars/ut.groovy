@@ -31,7 +31,7 @@ def call() {
                     }
                     files = findFiles(glob:'.scannerwork/report-task.txt')
                     if (files) {
-                        scanner = readProperties file: files[0].path, defaults: [dashboardUrl:'https://sonar.softwaregroup-bg.com']
+                        scanner = readProperties file: files[0].path, defaults: [dashboardUrl:'https://sonar.softwaregroup.com']
                     }
                 }
                 checkstyle pattern: '.lint/lint*.xml', canRunOnFailed: true
