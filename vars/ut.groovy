@@ -1,8 +1,6 @@
-def call(
-    params = [],
-    buildImage = 'node:8.15.0-alpine',
-    image = 'mhart/alpine-node:base-8.15.0'
-) {
+def call(Map params) {
+    def buildImage = params.buildImage?:'node:8.15.0-alpine'
+    def image = params.image?:'mhart/alpine-node:base-8.15.0'
     pipeline {
         agent { label 'implementation-slaves' }
         stages {
