@@ -11,6 +11,8 @@ def call(
                     UT_DB_PASS = credentials('UT_DB_PASS')
                     encryptionPass = credentials('UT_DB_ENCRYPTION_PASS')
                     DOCKER = credentials('dockerPublisher')
+                    BUILD_IMAGE = "${buildImage}"
+                    IMAGE = "${image}"
                 }
                 steps {
                     // sh 'printenv | sort'
