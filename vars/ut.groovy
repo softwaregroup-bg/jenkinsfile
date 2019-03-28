@@ -1,4 +1,5 @@
 def call(
+    params = [],
     buildImage = 'node:8.15.0-alpine',
     image = 'mhart/alpine-node:base-8.15.0'
 ) {
