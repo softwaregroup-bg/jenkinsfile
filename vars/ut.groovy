@@ -1,4 +1,7 @@
-def call() {
+def call(
+    buildImage = 'node:8.15.0-alpine',
+    image = 'mhart/alpine-node:base-8.15.0'
+) {
     pipeline {
         agent { label 'implementation-slaves' }
         stages {
@@ -8,6 +11,8 @@ def call() {
                     UT_DB_PASS = credentials('UT_DB_PASS')
                     encryptionPass = credentials('UT_DB_ENCRYPTION_PASS')
                     DOCKER = credentials('dockerPublisher')
+                    BUILD_IMAGE = buildImage
+                    IMAGE = image
                 }
                 steps {
                     // sh 'printenv | sort'
