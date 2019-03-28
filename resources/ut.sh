@@ -12,7 +12,7 @@ if [ -f "prefetch.json" ]; then
     PREFETCH=$'COPY prefetch.json package.json\nRUN npm --production=false install'
 fi
 docker build -t ${JOB_NAME}:test . -f-<<EOF
-FROM $BUILD_IMAGE
+FROM $buildImage
 RUN set -xe \
     && apk add --no-cache bash git openssh \
     && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v
@@ -71,7 +71,7 @@ FROM $JOB_NAME:test
 RUN npm prune --production
 EOF
     docker build -t ${JOB_NAME} . -f-<<EOF
-FROM $IMAGE
+FROM $image
 COPY --from=${JOB_NAME}:prod /app /app
 WORKDIR /app
 CMD ["node", "index.js"]
