@@ -61,7 +61,7 @@ def call(Map params = [:]) {
     <b>Job</b>: ${JOB_URL}<br>
     <b>Summary</b>: ${BUILD_URL}<br>
     <b>Console</b>: ${BUILD_URL}/console<br>
-    <b>Workspace</b>: ${BUILD_URL}/execution/node/3/ws<br>
+    <b>Workspace</b>: ${BUILD_URL}/execution/node/4/ws<br>
     <b>Sonar</b>: ''' + scanner.dashboardUrl + '''<br>
     <b>Checkstyle</b>: ${CHECKSTYLE_RESULT}<br>
     <b>Changes</b>:<pre>
