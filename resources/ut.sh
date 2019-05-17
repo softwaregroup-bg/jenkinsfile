@@ -50,7 +50,7 @@ docker run -i --rm \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     ${JOB_NAME}:test npm run jenkins
-docker run -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine sonar-scanner \
+docker run -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine \
   -Dsonar.host.url=https://sonar.softwaregroup.com/ \
   -Dsonar.projectKey=${UT_MODULE} \
   -Dsonar.projectName=${UT_MODULE} \
