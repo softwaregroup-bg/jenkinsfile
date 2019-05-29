@@ -14,7 +14,7 @@ fi
 docker build -t ${JOB_NAME}:test . -f-<<EOF
 FROM $BUILD_IMAGE
 RUN set -xe \
-    && apk add --no-cache bash git openssh \
+    && apk add --no-cache bash git openssh python make g++ \
     && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v
 WORKDIR /app
 COPY .npmrc .npmrc
