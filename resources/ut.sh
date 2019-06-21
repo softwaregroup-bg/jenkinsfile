@@ -11,6 +11,17 @@ fi
 if [ -f "prefetch.json" ]; then
     PREFETCH=$'COPY prefetch.json package.json\nRUN npm --production=false install'
 fi
+
+# Create prerequisite folders
+for item in coverage .lint dist
+do
+    if [ -d $item ] 
+    then
+        rm -rf $item
+    fi
+    mkdir $item
+done
+
 docker build -t ${JOB_NAME}:test . -f-<<EOF
 FROM $BUILD_IMAGE
 RUN set -xe \
@@ -29,6 +40,7 @@ docker run -i --rm \
     -v ~/.npmrc:/root/.npmrc:ro \
     -v ~/.gitconfig:/root/.gitconfig:ro \
     -v "$(pwd)/.lint:/app/.lint" \
+    -v "$(pwd)/dist:/app/dist" \
     -v "$(pwd)/coverage:/app/coverage" \
     -e JOB_TYPE=$JOB_TYPE \
     -e JOB_NAME=$JOB_NAME \
@@ -74,6 +86,7 @@ EOF
         FROM $IMAGE
         COPY --from=${JOB_NAME}:prod /app /app
         WORKDIR /app
+        COPY dist dist
         CMD ["node", "index.js"]
 EOF
     echo "$DOCKER_PSW" | docker login -u "$DOCKER_USR" --password-stdin nexus-dev.softwaregroup.com:5001
