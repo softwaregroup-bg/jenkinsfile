@@ -11,6 +11,17 @@ fi
 if [ -f "prefetch.json" ]; then
     PREFETCH=$'COPY prefetch.json package.json\nRUN npm --production=false install'
 fi
+
+# Create prerequisite folders
+for item in coverage .lint dist
+do
+    if [ -d $item ] 
+    then
+        rm -rf $item
+    fi
+    mkdir $item
+done
+
 docker build -t ${JOB_NAME}:test . -f-<<EOF
 FROM $BUILD_IMAGE
 RUN set -xe \
