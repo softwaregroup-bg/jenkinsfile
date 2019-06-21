@@ -9,7 +9,7 @@ if [ "$gitlabActionType" = "PUSH" ]; then
     git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
 fi
 if [ -f "prefetch.json" ]; then
-    PREFETCH=$'COPY prefetch.json package.json\nRUN npm --production=false install'
+    PREFETCH=$'COPY --chown=1000:1000 prefetch.json package.json\nRUN npm --production=false install'
 fi
 
 # Create prerequisite folders
@@ -26,19 +26,23 @@ docker build -t ${JOB_NAME}:test . -f-<<EOF
 FROM $BUILD_IMAGE
 RUN set -xe \
     && apk add --no-cache bash git openssh python make g++ \
-    && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v
+    && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v \
+    && mkdir /var/lib/SoftwareGroup && chown -R 1000:1000 /var/lib/SoftwareGroup
 WORKDIR /app
-COPY .npmrc .npmrc
+RUN chown -R 1000:1000 .
+USER node
+COPY --chown=1000:1000 .npmrc .npmrc
 ${PREFETCH}
-COPY package.json package.json
+COPY --chown=1000:1000 package.json package.json
 RUN npm --production=false install
-COPY . .
+COPY --chown=1000:1000 . .
 EOF
-docker run -i --rm -v "$(pwd)/.lint:/app/.lint" ${JOB_NAME}:test /bin/sh -c "rm .lint/*;npm ls > .lint/npm-ls.txt" || true
+docker run -i --rm -u 1000:1000 -v "$(pwd)/.lint:/app/.lint" ${JOB_NAME}:test /bin/sh -c "npm ls > .lint/npm-ls.txt" || true
 docker run -i --rm \
-    -v ~/.ssh:/root/.ssh:ro \
-    -v ~/.npmrc:/root/.npmrc:ro \
-    -v ~/.gitconfig:/root/.gitconfig:ro \
+    -u 1000:1000 \
+    -v ~/.ssh:/home/node/.ssh:ro \
+    -v ~/.npmrc:/home/node/.npmrc:ro \
+    -v ~/.gitconfig:/home/node/.gitconfig:ro \
     -v "$(pwd)/.lint:/app/.lint" \
     -v "$(pwd)/dist:/app/dist" \
     -v "$(pwd)/coverage:/app/coverage" \
@@ -77,6 +81,12 @@ docker run -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine \
   -Dsonar.language=js \
   -Dsonar.branch=${GIT_BRANCH} \
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+
+# Change default permission of .scannerwork from root to 1000
+docker run -i --rm --entrypoint=/bin/sh -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine \
+    -c 'chown -R 1000:1000 /app/.scannerwork'
+     
+
 if [ "${GIT_BRANCH}" = "origin/master" ]; then
     docker build -t ${JOB_NAME}:prod . -f-<<EOF
         FROM $JOB_NAME:test
