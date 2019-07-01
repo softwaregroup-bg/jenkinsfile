@@ -21,6 +21,7 @@ def call(Map params = [:]) {
                         currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.gitlabBranch
                     }
                     ansiColor('xterm') {
+                        sh(libraryResource('chown.sh'))
                         deleteDir() //clean workspace before build process
                         checkout scm
                         sh(libraryResource('ut.sh'))
