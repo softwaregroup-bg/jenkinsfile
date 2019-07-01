@@ -9,7 +9,7 @@ if [ "$gitlabActionType" = "PUSH" ]; then
     git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
 fi
 if [ -f "prefetch.json" ]; then
-    PREFETCH=$'COPY prefetch.json package.json\nRUN npm --production=false install'
+    PREFETCH=$'COPY --chown=node:node prefetch.json package.json\nRUN npm --production=false install'
 fi
 
 # Create prerequisite folders
@@ -26,19 +26,22 @@ docker build -t ${JOB_NAME}:test . -f-<<EOF
 FROM $BUILD_IMAGE
 RUN set -xe \
     && apk add --no-cache bash git openssh python make g++ \
-    && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v
+    && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v \
+    && mkdir /var/lib/SoftwareGroup && chown -R 1000:1000 /var/lib/SoftwareGroup
 WORKDIR /app
-COPY .npmrc .npmrc
+RUN chown -R node:node .
+USER node
+COPY --chown=node:node .npmrc .npmrc
 ${PREFETCH}
-COPY package.json package.json
+COPY --chown=node:node package.json package.json
 RUN npm --production=false install
-COPY . .
+COPY --chown=node:node . .
 EOF
-docker run -u $(id -u):$(id -g) -i --rm -v "$(pwd)/.lint:/app/.lint" ${JOB_NAME}:test /bin/sh -c "npm ls > .lint/npm-ls.txt" || true
-docker run -u $(id -u):$(id -g) -i --rm \
-    -v ~/.ssh:/root/.ssh:ro \
-    -v ~/.npmrc:/root/.npmrc:ro \
-    -v ~/.gitconfig:/root/.gitconfig:ro \
+docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${JOB_NAME}:test /bin/sh -c "npm ls > .lint/npm-ls.txt" || true
+docker run -u node:node -i --rm \
+    -v ~/.ssh:/home/node/.ssh:ro \
+    -v ~/.npmrc:/home/node/.npmrc:ro \
+    -v ~/.gitconfig:/home/node/.gitconfig:ro \
     -v "$(pwd)/.git:/app/.git" \
     -v "$(pwd)/.lint:/app/.lint" \
     -v "$(pwd)/dist:/app/dist" \
