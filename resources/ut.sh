@@ -34,7 +34,7 @@ COPY package.json package.json
 RUN npm --production=false install
 COPY . .
 EOF
-docker run -u $(id -u) -i --rm -v "$(pwd)/.lint:/app/.lint" ${JOB_NAME}:test /bin/sh -c "rm .lint/*;npm ls > .lint/npm-ls.txt" || true
+docker run -u $(id -u) -i --rm -v "$(pwd)/.lint:/app/.lint" ${JOB_NAME}:test /bin/sh -c "npm ls > .lint/npm-ls.txt" || true
 docker run -u $(id -u) -i --rm \
     -v ~/.ssh:/root/.ssh:ro \
     -v ~/.npmrc:/root/.npmrc:ro \

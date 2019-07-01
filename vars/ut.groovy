@@ -21,8 +21,6 @@ def call(Map params = [:]) {
                         currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.gitlabBranch
                     }
                     ansiColor('xterm') {
-                        deleteDir() //clean workspace before build process
-                        checkout scm
                         sh(libraryResource('ut.sh'))
                     }
                 }
@@ -30,7 +28,7 @@ def call(Map params = [:]) {
         }
         post {
             always {
-                sh 'docker run -i --rm --entrypoint=/bin/sh -v $(pwd):/app alpine:3.9 -c "chmod -R 777 /app"'
+                // sh 'docker run -i --rm --entrypoint=/bin/sh -v $(pwd):/app alpine:3.9 -c "chmod -R 777 /app"'
                 sh 'docker rmi -f $(docker images -q -f "dangling=true") || true'
                 script {
                     def files = findFiles(glob:'.lint/result.json')
