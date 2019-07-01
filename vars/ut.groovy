@@ -6,6 +6,7 @@ def call(Map params = [:]) {
         agent { label 'implementation-slaves' }
         stages {
             stage('build') {
+                options { skipDefaultCheckout() }
                 environment {
                     JOB_TYPE = 'pipeline'
                     UT_DB_PASS = credentials('UT_DB_PASS')
@@ -22,6 +23,7 @@ def call(Map params = [:]) {
                     }
                     ansiColor('xterm') {
                         sh 'docker run -i --rm --entrypoint=/bin/sh -v $(pwd):/app alpine:3.9 -c "chmod -R 777 /app/coverage /app/.lint /app/dist"'
+                        checkout scm
                         sh(libraryResource('ut.sh'))
                     }
                 }
