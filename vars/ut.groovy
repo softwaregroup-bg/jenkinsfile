@@ -4,8 +4,8 @@ def call(Map params = [:]) {
     def armimage = params.armimage?:''
     def scanner
     pipeline {
-        agent { label 'nodejs' }
-        options { skipDefaultCheckout() }
+        agent { label 'implementation-slaves' }
+        // options { skipDefaultCheckout() }
         stages {
             stage('build') {
                 environment {
@@ -23,8 +23,8 @@ def call(Map params = [:]) {
                         currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.gitlabBranch
                     }
                     ansiColor('xterm') {
-                        sh 'docker run -i --rm --entrypoint=/bin/sh -v $(pwd):/app alpine:3.9 -c "chmod -R 777 /app/coverage /app/.lint /app/dist /app/.scannerwork" || true'
-                        checkout scm
+                        // sh 'docker run -i --rm --entrypoint=/bin/sh -v $(pwd):/app alpine:3.9 -c "chmod -R 777 /app/coverage /app/.lint /app/dist /app/.scannerwork" || true'
+                        // checkout scm
                         sh(libraryResource('ut.sh'))
                     }
                 }
@@ -32,7 +32,7 @@ def call(Map params = [:]) {
         }
         post {
             always {
-                sh 'docker run -i --rm --entrypoint=/bin/sh -v $(pwd):/app alpine:3.9 -c "chmod -R 777 /app/coverage /app/.lint /app/dist /app/.scannerwork" || true'
+                // sh 'docker run -i --rm --entrypoint=/bin/sh -v $(pwd):/app alpine:3.9 -c "chmod -R 777 /app/coverage /app/.lint /app/dist /app/.scannerwork" || true'
                 sh 'docker rmi -f $(docker images -q -f "dangling=true") || true'
                 script {
                     def files = findFiles(glob:'.lint/result.json')
