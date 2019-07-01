@@ -21,7 +21,6 @@ def call(Map params = [:]) {
                         currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.gitlabBranch
                     }
                     ansiColor('xterm') {
-                        sh(libraryResource('chown.sh'))
                         deleteDir() //clean workspace before build process
                         checkout scm
                         sh(libraryResource('ut.sh'))
@@ -31,6 +30,7 @@ def call(Map params = [:]) {
         }
         post {
             always {
+                sh 'docker run -i --rm --entrypoint=/bin/sh -v $(pwd):/app alpine:3.9 -c "chown -R 1000:1000 /app"'
                 sh 'docker rmi -f $(docker images -q -f "dangling=true") || true'
                 script {
                     def files = findFiles(glob:'.lint/result.json')
