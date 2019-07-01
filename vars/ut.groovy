@@ -29,6 +29,7 @@ def call(Map params = [:]) {
         }
         post {
             always {
+                sh 'docker run -i --rm --entrypoint=/bin/sh -v $(pwd):/app alpine:3.9 -c "chmod -R 777 /app/coverage /app/.lint /app/dist"'
                 sh 'docker rmi -f $(docker images -q -f "dangling=true") || true'
                 script {
                     def files = findFiles(glob:'.lint/result.json')
