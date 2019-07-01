@@ -4,9 +4,9 @@ def call(Map params = [:]) {
     def armimage = params.armimage?:''
     pipeline {
         agent { label 'implementation-slaves' }
+        options { skipDefaultCheckout() }
         stages {
             stage('build') {
-                options { skipDefaultCheckout() }
                 environment {
                     JOB_TYPE = 'pipeline'
                     UT_DB_PASS = credentials('UT_DB_PASS')
