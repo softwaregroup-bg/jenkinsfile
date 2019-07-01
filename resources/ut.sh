@@ -66,7 +66,8 @@ docker run -u node:node -i --rm \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     ${JOB_NAME}:test npm run jenkins
-docker run -u $(id -u):$(id -g) -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine \
+docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine \
+  -c 'sonar-scanner \
   -Dsonar.host.url=https://sonar.softwaregroup.com/ \
   -Dsonar.projectKey=${UT_MODULE} \
   -Dsonar.projectName=${UT_MODULE} \
@@ -80,7 +81,8 @@ docker run -u $(id -u):$(id -g) -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3
   -Dsonar.test.exclusions=node_modules/**/*,coverage/**/* \
   -Dsonar.language=js \
   -Dsonar.branch=${GIT_BRANCH} \
-  -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+  -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+  && chown -R $(id -u):$(id -g) /app/.scannerwork'
 if [ "${GIT_BRANCH}" = "origin/master" ]; then
     docker build -t ${JOB_NAME}:prod . -f-<<EOF
         FROM $JOB_NAME:test
