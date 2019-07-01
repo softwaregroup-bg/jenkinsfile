@@ -34,8 +34,8 @@ COPY package.json package.json
 RUN npm --production=false install
 COPY . .
 EOF
-docker run -u jenkins -i --rm -v "$(pwd)/.lint:/app/.lint" ${JOB_NAME}:test /bin/sh -c "rm .lint/*;npm ls > .lint/npm-ls.txt" || true
-docker run -u jenkins -i --rm \
+docker run -u $(id -u) -i --rm -v "$(pwd)/.lint:/app/.lint" ${JOB_NAME}:test /bin/sh -c "rm .lint/*;npm ls > .lint/npm-ls.txt" || true
+docker run -u $(id -u) -i --rm \
     -v ~/.ssh:/root/.ssh:ro \
     -v ~/.npmrc:/root/.npmrc:ro \
     -v ~/.gitconfig:/root/.gitconfig:ro \
@@ -62,7 +62,7 @@ docker run -u jenkins -i --rm \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     ${JOB_NAME}:test npm run jenkins
-docker run -u jenkins -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine \
+docker run -u $(id -u) -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine \
   -Dsonar.host.url=https://sonar.softwaregroup.com/ \
   -Dsonar.projectKey=${UT_MODULE} \
   -Dsonar.projectName=${UT_MODULE} \
