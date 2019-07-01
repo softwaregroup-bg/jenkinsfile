@@ -4,7 +4,7 @@ def call(Map params = [:]) {
     def armimage = params.armimage?:''
     def scanner
     pipeline {
-        agent { label 'implementation-slaves' }
+        agent { label 'nodejs' }
         options { skipDefaultCheckout() }
         stages {
             stage('build') {
