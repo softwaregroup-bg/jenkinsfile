@@ -30,6 +30,7 @@ def call(Map params = [:]) {
         }
         post {
             always {
+                sh 'whoami'
                 sh 'docker run -i --rm --entrypoint=/bin/sh -v $(pwd):/app alpine:3.9 -c "chmod -R 777 /app"'
                 sh 'docker rmi -f $(docker images -q -f "dangling=true") || true'
                 script {
