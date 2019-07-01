@@ -39,6 +39,7 @@ docker run -u $(id -u) -i --rm \
     -v ~/.ssh:/root/.ssh:ro \
     -v ~/.npmrc:/root/.npmrc:ro \
     -v ~/.gitconfig:/root/.gitconfig:ro \
+    -v "$(pwd)/.git:/app/.git" \
     -v "$(pwd)/.lint:/app/.lint" \
     -v "$(pwd)/dist:/app/dist" \
     -v "$(pwd)/coverage:/app/coverage" \
