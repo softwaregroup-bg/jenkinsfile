@@ -9,13 +9,13 @@ if [ "$gitlabActionType" = "PUSH" ]; then
     git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
 fi
 if [ -f "prefetch.json" ]; then
-    PREFETCH=$'COPY prefetch.json package.json\nRUN npm --production=false install'
+    PREFETCH=$'COPY --chown=node:node prefetch.json package.json\nRUN npm --production=false install'
 fi
 
 # Create prerequisite folders
 for item in coverage .lint dist
 do
-    if [ -d $item ] 
+    if [ -d $item ]
     then
         rm -rf $item
     fi
@@ -26,19 +26,23 @@ docker build -t ${JOB_NAME}:test . -f-<<EOF
 FROM $BUILD_IMAGE
 RUN set -xe \
     && apk add --no-cache bash git openssh python make g++ \
-    && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v
+    && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v \
+    && mkdir /var/lib/SoftwareGroup && chown -R 1000:1000 /var/lib/SoftwareGroup
 WORKDIR /app
-COPY .npmrc .npmrc
+RUN chown -R node:node .
+USER node
+COPY --chown=node:node .npmrc .npmrc
 ${PREFETCH}
-COPY package.json package.json
+COPY --chown=node:node package.json package.json
 RUN npm --production=false install
-COPY . .
+COPY --chown=node:node . .
 EOF
-docker run -i --rm -v "$(pwd)/.lint:/app/.lint" ${JOB_NAME}:test /bin/sh -c "rm .lint/*;npm ls > .lint/npm-ls.txt" || true
-docker run -i --rm \
-    -v ~/.ssh:/root/.ssh:ro \
-    -v ~/.npmrc:/root/.npmrc:ro \
-    -v ~/.gitconfig:/root/.gitconfig:ro \
+docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${JOB_NAME}:test /bin/sh -c "npm ls > .lint/npm-ls.txt" || true
+docker run -u node:node -i --rm \
+    -v ~/.ssh:/home/node/.ssh:ro \
+    -v ~/.npmrc:/home/node/.npmrc:ro \
+    -v ~/.gitconfig:/home/node/.gitconfig:ro \
+    -v "$(pwd)/.git:/app/.git" \
     -v "$(pwd)/.lint:/app/.lint" \
     -v "$(pwd)/dist:/app/dist" \
     -v "$(pwd)/coverage:/app/coverage" \
@@ -62,7 +66,8 @@ docker run -i --rm \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     ${JOB_NAME}:test npm run jenkins
-docker run -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine \
+docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine \
+  -c "sonar-scanner \
   -Dsonar.host.url=https://sonar.softwaregroup.com/ \
   -Dsonar.projectKey=${UT_MODULE} \
   -Dsonar.projectName=${UT_MODULE} \
@@ -76,7 +81,8 @@ docker run -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine \
   -Dsonar.test.exclusions=node_modules/**/*,coverage/**/* \
   -Dsonar.language=js \
   -Dsonar.branch=${GIT_BRANCH} \
-  -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+  -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+  && chown -R $(id -u):$(id -g) /app/.scannerwork"
 if [ "${GIT_BRANCH}" = "origin/master" ]; then
     docker build -t ${JOB_NAME}:prod . -f-<<EOF
         FROM $JOB_NAME:test
