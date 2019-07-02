@@ -67,7 +67,7 @@ docker run -u node:node -i --rm \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     ${JOB_NAME}:test npm run jenkins
 docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine \
-  -c 'sonar-scanner \
+  -c "sonar-scanner \
   -Dsonar.host.url=https://sonar.softwaregroup.com/ \
   -Dsonar.projectKey=${UT_MODULE} \
   -Dsonar.projectName=${UT_MODULE} \
@@ -82,7 +82,7 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3
   -Dsonar.language=js \
   -Dsonar.branch=${GIT_BRANCH} \
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-  && chown -R $(id -u):$(id -g) /app/.scannerwork'
+  && chown -R $(id -u):$(id -g) /app/.scannerwork"
 if [ "${GIT_BRANCH}" = "origin/master" ]; then
     docker build -t ${JOB_NAME}:prod . -f-<<EOF
         FROM $JOB_NAME:test
