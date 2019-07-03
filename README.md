@@ -9,7 +9,11 @@ library identifier: 'jenkinsfile@master', retriever: modernSCM([
     remote: 'https://github.com/softwaregroup-bg/jenkinsfile.git'
 ])
 
-ut()
+ut ([
+    buildImage: 'node:10.15.3-alpine',
+    image: 'mhart/alpine-node:base-10.15.3',
+    armimage: 'arm64v8/node:10.15.3-alpine'
+])
 ```
 
 Then in Jenkins server, create a job of type `Pipeline` or
