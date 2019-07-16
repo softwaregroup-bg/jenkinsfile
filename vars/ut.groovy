@@ -1,10 +1,11 @@
 def call(Map params = [:]) {
     def buildImage = params.buildImage?:'node:8.15.0-alpine'
+    def agentLabel = params.agentLabel?:'implementation-slaves'
     def image = params.image?:'mhart/alpine-node:base-8.15.0'
     def armimage = params.armimage?:''
     def scanner = [dashboardUrl:'https://sonar.softwaregroup.com']
     pipeline {
-        agent { label 'implementation-slaves' }
+        agent { label agentLabel }
         stages {
             stage('build') {
                 environment {
