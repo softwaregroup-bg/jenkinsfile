@@ -57,7 +57,7 @@ docker run -u node:node -i --rm \
     -e GIT_BRANCH=$GIT_BRANCH \
     -e BRANCH_NAME=$BRANCH_NAME \
     -e BUILD_CAUSE=$BUILD_CAUSE \
-    -p 11000-12000:11000-12000 \ # expose some ports, app should map one of it
+    -p 11000-12000:11000-12000 \
     -e ${UT_PREFIX}_db__create__password=$UT_DB_PASS \
     -e ${UT_PREFIX}_db__connection__encryptionPass="$encryptionPass" \
     -e ${UT_PREFIX}_db__connection__database=${UT_MODULE}-$JOB_NAME-${BUILD_NUMBER} \
