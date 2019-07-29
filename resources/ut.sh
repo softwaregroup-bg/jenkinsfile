@@ -94,7 +94,8 @@ EOF
         COPY --from=${JOB_NAME}:prod /app /app
         WORKDIR /app
         COPY dist dist
-        CMD ["node", "index.js"]
+        ENTRYPOINT ["node", "index.js"]
+        CMD ["server"]
 EOF
     echo "$DOCKER_PSW" | docker login -u "$DOCKER_USR" --password-stdin nexus-dev.softwaregroup.com:5001
     docker tag ${JOB_NAME} nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
@@ -104,7 +105,8 @@ EOF
             FROM $ARMIMAGE
             COPY --from=${JOB_NAME}:prod /app /app
             WORKDIR /app
-            CMD ["node", "index.js"]
+            ENTRYPOINT ["node", "index.js"]
+            CMD ["server"]
 EOF
         docker tag ${JOB_NAME}-arm nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm:latest
         docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm:latest
