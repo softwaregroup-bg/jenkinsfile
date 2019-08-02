@@ -91,6 +91,7 @@ if [ "${GIT_BRANCH}" = "origin/master" ]; then
 EOF
     docker build -t ${JOB_NAME} . -f-<<EOF
         FROM $IMAGE
+        RUN apk add --no-cache tzdata
         COPY --from=${JOB_NAME}:prod /app /app
         WORKDIR /app
         COPY dist dist
