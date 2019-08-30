@@ -11,7 +11,7 @@ fi
 if [ -f "prefetch.json" ]; then
     PREFETCH=$'COPY --chown=node:node prefetch.json package.json\nRUN npm --production=false install'
 fi
-if [ -f "prefetch.Dockerfile" ]; then
+if [ -f "prefetch" ]; then
     PREFETCH=$(<prefetch)
 fi
 
