@@ -11,6 +11,9 @@ fi
 if [ -f "prefetch.json" ]; then
     PREFETCH=$'COPY --chown=node:node prefetch.json package.json\nRUN npm --production=false install'
 fi
+if [ -f "prefetch.Dockerfile" ]; then
+    PREFETCH=$(<prefetch)
+fi
 
 # Create prerequisite folders
 for item in coverage .lint dist
