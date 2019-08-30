@@ -10,9 +10,9 @@ library identifier: 'jenkinsfile@master', retriever: modernSCM([
 ])
 
 ut ([
-    buildImage: 'node:10.15.3-alpine',
-    image: 'mhart/alpine-node:base-10.15.3',
-    armimage: 'arm64v8/node:10.15.3-alpine'
+    buildImage: 'softwaregroup/ut-docker:7.0.0',
+    image: 'mhart/alpine-node:base-10.16.3',
+    armimage: 'arm64v8/node:10.16.3-alpine'
 ])
 ```
 
