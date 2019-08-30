@@ -1,6 +1,6 @@
 def call(Map params = [:]) {
-    def buildImage = params.buildImage?:'node:8.15.0-alpine'
-    def image = params.image?:'mhart/alpine-node:base-8.15.0'
+    def buildImage = params.buildImage?:'softwaregroup/ut-docker:7.0.0'
+    def image = params.image?:'mhart/alpine-node:base-10.16.3'
     def armimage = params.armimage?:''
     def scanner = [dashboardUrl:'https://sonar.softwaregroup.com']
     pipeline {

@@ -22,15 +22,20 @@ do
     mkdir $item
 done
 
+if [[ ! $BUILD_IMAGE =~ ^ut-docker.*$ ]]; then
+    RUNAPK=$(cat <<END
+RUN set -xe\
+ && apk add --no-cache bash git openssh python make g++\
+ && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v\
+ && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
+WORKDIR /app
+END
+)
+fi
+
 docker build -t ${JOB_NAME}:test . -f-<<EOF
 FROM $BUILD_IMAGE
-RUN set -xe \
-    && apk add --no-cache bash git openssh python make g++ \
-    && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v \
-    && mkdir /var/lib/SoftwareGroup && chown -R 1000:1000 /var/lib/SoftwareGroup
-WORKDIR /app
-RUN chown -R node:node .
-USER node
+$RUNAPK
 COPY --chown=node:node .npmrc .npmrc
 ${PREFETCH}
 COPY --chown=node:node package.json package.json
