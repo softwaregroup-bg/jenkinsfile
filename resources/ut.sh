@@ -108,7 +108,7 @@ EOF
 EOF
     echo "$DOCKER_PSW" | docker login -u "$DOCKER_USR" --password-stdin nexus-dev.softwaregroup.com:5001
     if [ "${ARMIMAGE}" ]; then
-        docker build -t ${JOB_NAME}-aarch64 . -f-<<EOF
+        docker build -t ${JOB_NAME}-arm64 . -f-<<EOF
             FROM $ARMIMAGE
             COPY --from=${JOB_NAME}:prod /app /app
             WORKDIR /app
