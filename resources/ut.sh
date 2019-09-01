@@ -97,7 +97,7 @@ if [ "${GIT_BRANCH}" = "origin/master" ]; then
         FROM $JOB_NAME:test
         RUN npm prune --production
 EOF
-    docker build -t ${JOB_NAME} . -f-<<EOF
+    docker build -t ${JOB_NAME}-amd64 . -f-<<EOF
         FROM $IMAGE
         RUN apk add --no-cache tzdata
         COPY --from=${JOB_NAME}:prod /app /app
@@ -107,20 +107,25 @@ EOF
         CMD ["server"]
 EOF
     echo "$DOCKER_PSW" | docker login -u "$DOCKER_USR" --password-stdin nexus-dev.softwaregroup.com:5001
-    docker tag ${JOB_NAME} nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
-    docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
     if [ "${ARMIMAGE}" ]; then
-        docker build -t ${JOB_NAME}-arm . -f-<<EOF
+        docker build -t ${JOB_NAME}-aarch64 . -f-<<EOF
             FROM $ARMIMAGE
             COPY --from=${JOB_NAME}:prod /app /app
             WORKDIR /app
             ENTRYPOINT ["node", "index.js"]
             CMD ["server"]
 EOF
-        docker tag ${JOB_NAME}-arm nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm:latest
-        docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm:latest
-        docker rmi ${JOB_NAME}:prod ${JOB_NAME} ${JOB_NAME}-arm nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm:latest
+        docker tag ${JOB_NAME}-amd64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-amd64:latest
+        docker tag ${JOB_NAME}-arm64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm64:latest
+        docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-amd64:latest
+        docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm64:latest
+        docker rmi ${JOB_NAME}:prod ${JOB_NAME}-amd64 ${JOB_NAME}-arm64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-amd64:latest nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm64:latest
+        DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create $JOB_NAME:latest $JOB_NAME:amd64 $JOB_NAME:arm64
+        DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate $JOB_NAME:latest $JOB_NAME:arm64 --os linux --arch arm64 --variant v8
+        DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push $JOB_NAME:latest
     else
+        docker tag ${JOB_NAME}-amd64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
+        docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
         docker rmi ${JOB_NAME}:prod ${JOB_NAME} nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
     fi
 fi
