@@ -120,9 +120,9 @@ EOF
         docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-amd64:latest
         docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm64:latest
         docker rmi ${JOB_NAME}:prod ${JOB_NAME}-amd64 ${JOB_NAME}-arm64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-amd64:latest nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm64:latest
-        DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME:latest nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME-amd64:latest nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME-amd64:latest
+        DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create --insecure nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME:latest nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME-amd64:latest nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME-amd64:latest
         DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME:latest nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME:arm64 --os linux --arch arm64 --variant v8
-        DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME:latest
+        DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push --insecure nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME:latest
     else
         docker tag ${JOB_NAME}-amd64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
         docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
