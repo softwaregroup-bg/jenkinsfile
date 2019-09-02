@@ -126,6 +126,6 @@ EOF
     else
         docker tag ${JOB_NAME}-amd64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
         docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
-        docker rmi ${JOB_NAME}:prod ${JOB_NAME} nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
+        docker rmi ${JOB_NAME}:prod ${JOB_NAME}-amd64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
     fi
 fi
