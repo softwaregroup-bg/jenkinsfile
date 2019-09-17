@@ -71,6 +71,7 @@ def call(Map params = [:]) {
     <b>Tests</b>:<pre>
     ${FILE,path=".lint/test.txt"}
     </pre>
+    <b>npm audit</b>:${FILE,path=".lint/audit.html"}
     ''',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'],[$class: 'RequesterRecipientProvider']],
                     subject: 'Build ${BUILD_STATUS} in Jenkins: ${JOB_NAME} ${BUILD_DISPLAY_NAME} (' + currentBuild.durationString +')'
