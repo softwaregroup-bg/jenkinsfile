@@ -39,7 +39,7 @@ fi
 docker build -t ${JOB_NAME}:test . -f-<<EOF
 FROM $BUILD_IMAGE
 $RUNAPK
-RUN ssh-keyscan -H git.softwaregroup.com  > ~/.ssh/known_hosts
+RUN mkdir ~/.ssh && ssh-keyscan -H git.softwaregroup.com  > ~/.ssh/known_hosts
 COPY --chown=node:node .npmrc .npmrc
 ${PREFETCH}
 COPY --chown=node:node package.json package.json
