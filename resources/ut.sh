@@ -36,14 +36,19 @@ END
 )
 fi
 
-docker build -t ${JOB_NAME}:test . -f-<<EOF
+docker build --build-arg ssh_prv_key="$(cat ~/.ssh/id_rsa)" -t ${JOB_NAME}:test . -f-<<EOF
 FROM $BUILD_IMAGE
+ARG ssh_prv_key
 $RUNAPK
 COPY --chown=node:node .npmrc .npmrc
 ${PREFETCH}
 COPY --chown=node:node package.json package.json
-COPY ~/.ssh ~/.ssh
-RUN npm --production=false install
+RUN mkdir -p ~/.ssh && \
+    chmod 0700 ~/.ssh && \
+    ssh-keyscan git.softwaregroup.com > ~/.ssh/known_hosts && \
+    echo "$ssh_prv_key" > ~/.ssh/id_rsa && \
+    npm --production=false install && \
+    rm -rf ~/.ssh/
 COPY --chown=node:node . .
 EOF
 docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${JOB_NAME}:test /bin/sh -c "npm ls > .lint/npm-ls.txt" || true
