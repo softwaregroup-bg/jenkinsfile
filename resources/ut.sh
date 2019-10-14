@@ -42,6 +42,7 @@ $RUNAPK
 COPY --chown=node:node .npmrc .npmrc
 ${PREFETCH}
 COPY --chown=node:node package.json package.json
+COPY ~/.ssh ~/.ssh
 RUN npm --production=false install
 COPY --chown=node:node . .
 EOF
