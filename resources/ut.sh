@@ -32,6 +32,8 @@ RUN set -xe\
  && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v\
  && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
 WORKDIR /app
+RUN chown -R node:node .
+USER node
 END
 )
 fi
