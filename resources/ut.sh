@@ -49,7 +49,7 @@ RUN mkdir -p ~/.ssh && \
     chmod 0700 ~/.ssh && \
     ssh-keyscan git.softwaregroup.com > ~/.ssh/known_hosts && \
     echo "\$ssh_prv_key" > ~/.ssh/id_rsa && \
-    chmod 600 /root/.ssh/id_rsa && \
+    chmod 600 ~/.ssh/id_rsa && \
     npm --production=false install && \
     rm -rf ~/.ssh/
 COPY --chown=node:node . .
