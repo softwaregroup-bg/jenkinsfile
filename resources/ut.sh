@@ -1,12 +1,16 @@
 #!/bin/bash
 set -x
 set -e
-UT_MODULE=${gitlabSourceRepoName/impl-/}
+GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+UT_PROJECT=`git remote get-url origin | sed -n -r 's/.*\/(ut-.*|impl-.*).git/\1/p'`
+[[ ${UT_PROJECT} =~ impl-(.*) ]]; UT_IMPL=${BASH_REMATCH[1]}
+[[ ${UT_PROJECT} =~ ut-(.*) ]]; UT_MODULE=${BASH_REMATCH[1]}
+[[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]]; RELEASE=${BASH_REMATCH[0]}
 TAP_TIMEOUT=1000
 CONTAINER_NAME=$JOB_NAME-$BUILD_NUMBER
-UT_PREFIX=ut_${UT_MODULE//[-\/\\]/_}_jenkins
-if [ "$gitlabActionType" = "PUSH" ]; then
-    git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
+UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
+if [[ $RELEASE && "${CHANGE_ID}" = "" ]]; then
+    git checkout -B ${GIT_BRANCH} --track remotes/origin/${GIT_BRANCH}
 fi
 if [ -f "prefetch.json" ]; then
     PREFETCH=$'COPY --chown=node:node prefetch.json package.json\nRUN npm --production=false install'
@@ -60,17 +64,17 @@ docker run -u node:node -i --rm \
     -e BUILD_NUMBER=$BUILD_NUMBER \
     -e UT_ENV=jenkins \
     -e UT_DB_PASS=$UT_DB_PASS \
-    -e UT_MODULE=$UT_MODULE \
+    -e UT_MODULE=$UT_IMPL \
     -e GIT_URL=$GIT_URL \
-    -e GIT_BRANCH=$GIT_BRANCH \
+    -e GIT_BRANCH=origin/$GIT_BRANCH \
     -e BRANCH_NAME=$BRANCH_NAME \
     -e BUILD_CAUSE=$BUILD_CAUSE \
     -e ${UT_PREFIX}_db__create__password=$UT_DB_PASS \
     -e ${UT_PREFIX}_db__connection__encryptionPass="$encryptionPass" \
-    -e ${UT_PREFIX}_db__connection__database=${UT_MODULE}-$JOB_NAME-${BUILD_NUMBER} \
+    -e ${UT_PREFIX}_db__connection__database=${UT_IMPL}-$JOB_NAME-${BUILD_NUMBER} \
     -e ${UT_PREFIX}_utAudit__db__create__password=$UT_DB_PASS \
-    -e ${UT_PREFIX}_utAudit__db__connection__database=${UT_MODULE}-audit-$JOB_NAME-${BUILD_NUMBER} \
-    -e ${UT_PREFIX}_utHistory__db__connection__database=${UT_MODULE}-history-$JOB_NAME-${BUILD_NUMBER} \
+    -e ${UT_PREFIX}_utAudit__db__connection__database=${UT_IMPL}-audit-$JOB_NAME-${BUILD_NUMBER} \
+    -e ${UT_PREFIX}_utHistory__db__connection__database=${UT_IMPL}-history-$JOB_NAME-${BUILD_NUMBER} \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     --entrypoint=/bin/bash \
@@ -78,8 +82,8 @@ docker run -u node:node -i --rm \
 docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3.2.0-alpine \
   -c "sonar-scanner \
   -Dsonar.host.url=https://sonar.softwaregroup.com/ \
-  -Dsonar.projectKey=${UT_MODULE} \
-  -Dsonar.projectName=${UT_MODULE} \
+  -Dsonar.projectKey=${UT_PROJECT} \
+  -Dsonar.projectName=${UT_PROJECT} \
   -Dsonar.projectVersion=1 \
   -Dsonar.projectBaseDir=/app \
   -Dsonar.sources=. \
@@ -89,18 +93,20 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3
   -Dsonar.test.inclusions=test/**/*.js,**/*.test.js \
   -Dsonar.test.exclusions=node_modules/**/*,coverage/**/* \
   -Dsonar.language=js \
-  -Dsonar.branch=${GIT_BRANCH} \
+  -Dsonar.branch=origin/${GIT_BRANCH} \
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
   && chown -R $(id -u):$(id -g) /app/.scannerwork"
-if [ "${GIT_BRANCH}" = "origin/master" ]; then
-    docker build -t ${JOB_NAME}:prod . -f-<<EOF
+if [ $RELEASE && ${UT_IMPL} ]; then
+    [[ $RELEASE =~ \/(.*)$ ]]; TAG=${BASH_REMATCH[1]}
+    if [ "$TAG" = "" ]; then TAG="latest"; fi
+    docker build -t ${JOB_NAME}:$RELEASE . -f-<<EOF
         FROM $JOB_NAME:test
         RUN npm prune --production
 EOF
     docker build -t ${JOB_NAME}-amd64 . -f-<<EOF
         FROM $IMAGE
         RUN apk add --no-cache tzdata
-        COPY --from=${JOB_NAME}:prod /app /app
+        COPY --from=${JOB_NAME}:$RELEASE /app /app
         WORKDIR /app
         COPY dist dist
         ENTRYPOINT ["node", "index.js"]
@@ -110,22 +116,22 @@ EOF
     if [ "${ARMIMAGE}" ]; then
         docker build -t ${JOB_NAME}-arm64 . -f-<<EOF
             FROM $ARMIMAGE
-            COPY --from=${JOB_NAME}:prod /app /app
+            COPY --from=${JOB_NAME}:$RELEASE /app /app
             WORKDIR /app
             ENTRYPOINT ["node", "index.js"]
             CMD ["server"]
 EOF
-        docker tag ${JOB_NAME}-amd64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-amd64:latest
-        docker tag ${JOB_NAME}-arm64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm64:latest
-        docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-amd64:latest
-        docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm64:latest
-        docker rmi ${JOB_NAME}:prod ${JOB_NAME}-amd64 ${JOB_NAME}-arm64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-amd64:latest nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm64:latest
-        # DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME:latest nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME-amd64:latest nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME-arm64:latest
-        # DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME:latest nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME-arm64:latest --os linux --arch arm64 --variant v8
-        # DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME:latest
+        docker tag ${JOB_NAME}-amd64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-amd64:$TAG
+        docker tag ${JOB_NAME}-arm64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm64:$TAG
+        docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-amd64:$TAG
+        docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm64:$TAG
+        docker rmi ${JOB_NAME}:$RELEASE ${JOB_NAME}-amd64 ${JOB_NAME}-arm64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-amd64:$TAG nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}-arm64:$TAG
+        # DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME:$TAG nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME-amd64:$TAG nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME-arm64:$TAG
+        # DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME:$TAG nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME-arm64:$TAG --os linux --arch arm64 --variant v8
+        # DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push nexus-dev.softwaregroup.com:5001/ut/$JOB_NAME:$TAG
     else
-        docker tag ${JOB_NAME}-amd64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
-        docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
-        docker rmi ${JOB_NAME}:prod ${JOB_NAME}-amd64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:latest
+        docker tag ${JOB_NAME}-amd64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:$TAG
+        docker push nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:$TAG
+        docker rmi ${JOB_NAME}:$RELEASE ${JOB_NAME}-amd64 nexus-dev.softwaregroup.com:5001/ut/${JOB_NAME}:$TAG
     fi
 fi

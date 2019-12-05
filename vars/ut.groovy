@@ -79,9 +79,12 @@ def call(Map params = [:]) {
             }
             failure {
                 updateGitlabCommitStatus name: 'build', state: 'failed'
+                // https://doc.nuxeo.com/corg/jenkins-pipeline-usage/
+                step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Successfully built on Jenkins', state: 'SUCCESS']]]])
             }
             success {
                 updateGitlabCommitStatus name: 'build', state: 'success'
+                step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Failed to build on Jenkins', state: 'FAILURE']]]])
             }
         }
     }
