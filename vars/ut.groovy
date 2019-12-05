@@ -4,6 +4,7 @@ def call(Map params = [:]) {
     def armimage = params.armimage?:''
     def scanner = [dashboardUrl:'https://sonar.softwaregroup.com']
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
+    def repoUrl
     pipeline {
         agent { label 'implementation-slaves' }
         stages {
@@ -20,6 +21,8 @@ def call(Map params = [:]) {
                 steps {
                     // sh 'printenv | sort'
                     script {
+                        pkgjson = readJSON file: 'package.json'
+                        repoUrl = pkgjson.repository.url
                         currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.GIT_BRANCH
                     }
                     ansiColor('xterm') {
@@ -79,13 +82,37 @@ def call(Map params = [:]) {
                 )
             }
             failure {
-                updateGitlabCommitStatus name: 'build', state: 'failed'
+                script {
+                    if (repoUrl.substring(0,14) == 'git@github.com') {
+                        step([
+                            $class: 'GitHubCommitStatusSetter',
+                            reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
+                            contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins'],
+                            statusResultSource: [$class: 'ConditionalStatusResultSource', results: [
+                                [$class: 'AnyBuildResult', message: 'Failed to build on Jenkins', state: 'FAILURE']
+                            ]
+                        ]])
+                    } else {
+                        updateGitlabCommitStatus name: 'build', state: 'failed'
+                    }
+                }
                 // https://doc.nuxeo.com/corg/jenkins-pipeline-usage/
-                step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Failed to build on Jenkins', state: 'FAILURE']]]])
             }
             success {
-                updateGitlabCommitStatus name: 'build', state: 'success'
-                step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Successfully built on Jenkins', state: 'SUCCESS']]]])
+                script {
+                    if (repoUrl.substring(0,14) == 'git@github.com') {
+                        step([
+                            $class: 'GitHubCommitStatusSetter',
+                            reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
+                            contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins'],
+                            statusResultSource: [$class: 'ConditionalStatusResultSource', results: [
+                                [$class: 'AnyBuildResult', message: 'Successfully built on Jenkins', state: 'SUCCESS']
+                            ]
+                        ]])
+                    } else {
+                        updateGitlabCommitStatus name: 'build', state: 'success'
+                    }
+                }
             }
         }
     }
