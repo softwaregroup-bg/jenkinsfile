@@ -1,7 +1,6 @@
 #!/bin/bash
 set -x
 set -e
-GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 UT_PROJECT=`git remote get-url origin | sed -n -r 's/.*\/(ut-.*|impl-.*).git/\1/p'`
 [[ ${UT_PROJECT} =~ impl-(.*) ]]; UT_IMPL=${BASH_REMATCH[1]}
 [[ ${UT_PROJECT} =~ ut-(.*) ]]; UT_MODULE=${BASH_REMATCH[1]}
