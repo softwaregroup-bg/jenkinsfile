@@ -9,7 +9,7 @@ TAP_TIMEOUT=1000
 CONTAINER_NAME=$JOB_NAME-$BUILD_NUMBER
 UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
 if [[ $RELEASE && "${CHANGE_ID}" = "" ]]; then
-    git checkout -B ${GIT_BRANCH} --track remotes/origin/${GIT_BRANCH}
+    git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
 fi
 if [ -f "prefetch.json" ]; then
     PREFETCH=$'COPY --chown=node:node prefetch.json package.json\nRUN npm --production=false install'
@@ -65,7 +65,7 @@ docker run -u node:node -i --rm \
     -e UT_DB_PASS=$UT_DB_PASS \
     -e UT_MODULE=$UT_IMPL \
     -e GIT_URL=$GIT_URL \
-    -e GIT_BRANCH=origin/$GIT_BRANCH \
+    -e GIT_BRANCH=$GIT_BRANCH \
     -e BRANCH_NAME=$BRANCH_NAME \
     -e BUILD_CAUSE=$BUILD_CAUSE \
     -e ${UT_PREFIX}_db__create__password=$UT_DB_PASS \
@@ -92,7 +92,7 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3
   -Dsonar.test.inclusions=test/**/*.js,**/*.test.js \
   -Dsonar.test.exclusions=node_modules/**/*,coverage/**/* \
   -Dsonar.language=js \
-  -Dsonar.branch=origin/${GIT_BRANCH} \
+  -Dsonar.branch=${GIT_BRANCH} \
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
   && chown -R $(id -u):$(id -g) /app/.scannerwork"
 if [ $RELEASE && ${UT_IMPL} ]; then
