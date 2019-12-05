@@ -3,8 +3,9 @@ def call(Map params = [:]) {
     def image = params.image?:'mhart/alpine-node:base-10.16.3'
     def armimage = params.armimage?:''
     def scanner = [dashboardUrl:'https://sonar.softwaregroup.com']
+    def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
     pipeline {
-        agent { label 'implementation-slaves' }
+        agent { label agentLabel }
         stages {
             stage('build') {
                 environment {
@@ -19,7 +20,7 @@ def call(Map params = [:]) {
                 steps {
                     // sh 'printenv | sort'
                     script {
-                        currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.gitlabBranch
+                        currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.GIT_BRANCH
                     }
                     ansiColor('xterm') {
                         sh(libraryResource('ut.sh'))
@@ -34,7 +35,7 @@ def call(Map params = [:]) {
                     def files = findFiles(glob:'.lint/result.json')
                     if (files) {
                         pkg = readJSON file: files[0].path
-                        currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.gitlabBranch + ' : ' + pkg.version
+                        currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.GIT_BRANCH + ' : ' + pkg.version
                     }
                     files = findFiles(glob:'.scannerwork/report-task.txt')
                     if (files) {

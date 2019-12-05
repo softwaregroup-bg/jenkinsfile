@@ -1,7 +1,7 @@
 #!/bin/bash
 set -x
 set -e
-UT_PROJECT=`git remote get-url origin | sed -n -r 's/.*\/(ut-.*|impl-.*).git/\1/p'`
+UT_PROJECT=`git config --get remote.origin.url | sed -n -r 's/.*\/(ut-.*|impl-.*).git/\1/p'`
 [[ ${UT_PROJECT} =~ impl-(.*) ]] || true && UT_IMPL=${BASH_REMATCH[1]}
 [[ ${UT_PROJECT} =~ ut-(.*) ]] || true && UT_MODULE=${BASH_REMATCH[1]}
 [[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]] || true && RELEASE=${BASH_REMATCH[0]}
