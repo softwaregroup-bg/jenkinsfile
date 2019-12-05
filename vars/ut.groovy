@@ -5,7 +5,7 @@ def call(Map params = [:]) {
     def scanner = [dashboardUrl:'https://sonar.softwaregroup.com']
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
     pipeline {
-        agent { label agentLabel }
+        agent { label 'implementation-slaves' }
         stages {
             stage('build') {
                 environment {
