@@ -42,7 +42,7 @@ fi
 docker build -t ${JOB_NAME}:test . -f-<<EOF
 FROM $BUILD_IMAGE
 $RUNAPK
-COPY --chown=node:node .npmrc .npmrc
+COPY --chown=node:node .npmrc* /app
 ${PREFETCH}
 COPY --chown=node:node package.json package.json
 RUN npm --production=false install
