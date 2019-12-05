@@ -2,9 +2,9 @@
 set -x
 set -e
 UT_PROJECT=`git remote get-url origin | sed -n -r 's/.*\/(ut-.*|impl-.*).git/\1/p'`
-[[ ${UT_PROJECT} =~ impl-(.*) ]]; UT_IMPL=${BASH_REMATCH[1]}
-[[ ${UT_PROJECT} =~ ut-(.*) ]]; UT_MODULE=${BASH_REMATCH[1]}
-[[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]]; RELEASE=${BASH_REMATCH[0]}
+[[ ${UT_PROJECT} =~ impl-(.*) ]] || true && UT_IMPL=${BASH_REMATCH[1]}
+[[ ${UT_PROJECT} =~ ut-(.*) ]] || true && UT_MODULE=${BASH_REMATCH[1]}
+[[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]] || true && RELEASE=${BASH_REMATCH[0]}
 TAP_TIMEOUT=1000
 CONTAINER_NAME=$JOB_NAME-$BUILD_NUMBER
 UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
@@ -96,7 +96,7 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
   && chown -R $(id -u):$(id -g) /app/.scannerwork"
 if [ $RELEASE && ${UT_IMPL} ]; then
-    [[ $RELEASE =~ \/(.*)$ ]]; TAG=${BASH_REMATCH[1]}
+    [[ $RELEASE =~ \/(.*)$ ]] || true && TAG=${BASH_REMATCH[1]}
     if [ "$TAG" = "" ]; then TAG="latest"; fi
     docker build -t ${JOB_NAME}:$RELEASE . -f-<<EOF
         FROM $JOB_NAME:test
