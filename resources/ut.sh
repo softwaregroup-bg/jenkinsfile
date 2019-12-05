@@ -12,7 +12,7 @@ if [[ $RELEASE && "${CHANGE_ID}" = "" ]]; then
     git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
 fi
 if [ -f "prefetch.json" ]; then
-    PREFETCH=$'COPY --chown=node:node prefetch.json package.json\nRUN npm --production=false install'
+    PREFETCH=$'COPY --chown=node:node .npmrc* prefetch.json /app/\nRUN npm --production=false install'
 fi
 if [ -f "prefetch" ]; then
     PREFETCH=$(<prefetch)
@@ -42,9 +42,8 @@ fi
 docker build -t ${JOB_NAME}:test . -f-<<EOF
 FROM $BUILD_IMAGE
 $RUNAPK
-COPY --chown=node:node .npmrc* /app
 ${PREFETCH}
-COPY --chown=node:node package.json package.json
+COPY --chown=node:node .npmrc* package.json /app/
 RUN npm --production=false install
 COPY --chown=node:node . .
 EOF
