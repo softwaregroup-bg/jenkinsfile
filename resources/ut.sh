@@ -2,6 +2,12 @@
 set -x
 set -e
 UT_PROJECT=`git config --get remote.origin.url | sed -n -r 's/.*\/(ut-.*|impl-.*).git/\1/p'`
+RELEASE=
+PREFETCH=
+NPMRC=
+RUNAPK=
+UT_IMPL=
+UT_MODULE=
 [[ ${UT_PROJECT} =~ impl-(.*) ]] || true && UT_IMPL=${BASH_REMATCH[1]}
 [[ ${UT_PROJECT} =~ ut-(.*) ]] || true && UT_MODULE=${BASH_REMATCH[1]}
 [[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]] || true && RELEASE=${BASH_REMATCH[0]}
@@ -17,9 +23,6 @@ UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
 if [[ $RELEASE && "${CHANGE_ID}" = "" ]]; then
     git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
 fi
-PREFETCH=
-NPMRC=
-RUNAPK=
 if [ -f "prefetch.json" ]; then
     PREFETCH=$'COPY --chown=node:node prefetch.json /app/\nRUN npm --production=false install'
 fi
@@ -108,8 +111,8 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
   && chown -R $(id -u):$(id -g) /app/.scannerwork"
 if [[ $RELEASE && ${UT_IMPL} ]]; then
-    [[ $RELEASE =~ \/(.*)$ ]] || true && TAG=${BASH_REMATCH[1]}
-    if [ "$TAG" = "" ]; then TAG="latest"; fi
+    TAG=${RELEASE//[\/\\]/-}
+    if [ "$TAG" = "master" ]; then TAG="latest"; fi
     docker build -t ${JOB_NAME}:$TAG . -f-<<EOF
         FROM $JOB_NAME:test
         RUN npm prune --production
