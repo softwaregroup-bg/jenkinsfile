@@ -60,21 +60,21 @@ def call(Map params = [:]) {
                         emailext(
                             mimeType: 'text/html',
                             body: '''<h1>Jenkins build ${JOB_NAME} ${BUILD_DISPLAY_NAME}</h1>
-            <h2><b>Status</b>: ${BUILD_STATUS}</h2>
-            <b>Trigger</b>:  ${CAUSE}<br>
-            <b>Job</b>: ${JOB_URL}<br>
-            <b>Summary</b>: ${BUILD_URL}<br>
-            <b>Console</b>: ${BUILD_URL}/console<br>
-            <b>Workspace</b>: ${BUILD_URL}/execution/node/4/ws<br>
-            <b>Sonar</b>: ''' + scanner.dashboardUrl + '''<br>
-            <b>Checkstyle</b>: ${CHECKSTYLE_RESULT}<br>
-            <b>Changes</b>:<pre>
-            ${CHANGES}
-            </pre>
-            <b>Tests</b>:<pre>
-            ${FILE,path=".lint/test.txt"}
-            </pre>
-            <b>npm audit</b>:${FILE,path=".lint/audit.html"}
+<h2><b>Status</b>: ${BUILD_STATUS}</h2>
+<b>Trigger</b>:  ${CAUSE}<br>
+<b>Job</b>: ${JOB_URL}<br>
+<b>Summary</b>: ${BUILD_URL}<br>
+<b>Console</b>: ${BUILD_URL}/console<br>
+<b>Workspace</b>: ${BUILD_URL}/execution/node/4/ws<br>
+<b>Sonar</b>: ''' + scanner.dashboardUrl + '''<br>
+<b>Checkstyle</b>: ${CHECKSTYLE_RESULT}<br>
+<b>Changes</b>:<pre>
+${CHANGES}
+</pre>
+<b>Tests</b>:<pre>
+${FILE,path=".lint/test.txt"}
+</pre>
+<b>npm audit</b>:${FILE,path=".lint/audit.html"}
             ''',
                             recipientProviders: [[$class: 'CulpritsRecipientProvider'],[$class: 'RequesterRecipientProvider']],
                             subject: 'Build ${BUILD_STATUS} in Jenkins: ${JOB_NAME} ${BUILD_DISPLAY_NAME} (' + currentBuild.durationString +')'
