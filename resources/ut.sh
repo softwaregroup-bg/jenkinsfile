@@ -17,11 +17,17 @@ UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
 if [[ $RELEASE && "${CHANGE_ID}" = "" ]]; then
     git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
 fi
+PREFETCH=
+NPMRC=
+RUNAPK=
 if [ -f "prefetch.json" ]; then
-    PREFETCH=$'COPY --chown=node:node .npmrc* prefetch.json /app/\nRUN npm --production=false install'
+    PREFETCH=$'COPY --chown=node:node prefetch.json /app/\nRUN npm --production=false install'
 fi
 if [ -f "prefetch" ]; then
     PREFETCH=$(<prefetch)
+fi
+if [ -f ".npmrc" ]; then
+    NPMRC='COPY --chown=node:node .npmrc .npmrc'
 fi
 
 # Create prerequisite folders
@@ -48,8 +54,9 @@ fi
 docker build -t ${JOB_NAME}:test . -f-<<EOF
 FROM $BUILD_IMAGE
 $RUNAPK
+${NPMRC}
 ${PREFETCH}
-COPY --chown=node:node .npmrc* package.json /app/
+COPY --chown=node:node package.json /app/
 RUN npm --production=false install
 COPY --chown=node:node . .
 EOF
