@@ -107,7 +107,7 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app newtmitch/sonar-scanner:3
   -Dsonar.branch=${GIT_BRANCH} \
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
   && chown -R $(id -u):$(id -g) /app/.scannerwork"
-if [ $RELEASE && ${UT_IMPL} ]; then
+if [[ $RELEASE && ${UT_IMPL} ]]; then
     [[ $RELEASE =~ \/(.*)$ ]] || true && TAG=${BASH_REMATCH[1]}
     if [ "$TAG" = "" ]; then TAG="latest"; fi
     docker build -t ${JOB_NAME}:$RELEASE . -f-<<EOF
