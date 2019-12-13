@@ -8,7 +8,9 @@ def call(Map params = [:]) {
     pipeline {
         agent { label 'implementation-slaves' }
         stages {
+            when { not { changelog "^[ci.skip]" }}
             stage('build') {
+                when
                 environment {
                     JOB_TYPE = 'pipeline'
                     UT_DB_PASS = credentials('UT_DB_PASS')
@@ -30,87 +32,87 @@ def call(Map params = [:]) {
                     }
                 }
             }
-        }
-        post {
-            always {
-                sh 'docker rmi -f $(docker images -q -f "dangling=true") || true'
-                script {
-                    def files = findFiles(glob:'.lint/result.json')
-                    if (files) {
-                        pkg = readJSON file: files[0].path
-                        currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.GIT_BRANCH + ' : ' + pkg.version
+            post {
+                always {
+                    sh 'docker rmi -f $(docker images -q -f "dangling=true") || true'
+                    script {
+                        def files = findFiles(glob:'.lint/result.json')
+                        if (files) {
+                            pkg = readJSON file: files[0].path
+                            currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.GIT_BRANCH + ' : ' + pkg.version
+                        }
+                        files = findFiles(glob:'.scannerwork/report-task.txt')
+                        if (files) {
+                            scanner = readProperties file: files[0].path, defaults: [dashboardUrl:'https://sonar.softwaregroup.com']
+                        }
                     }
-                    files = findFiles(glob:'.scannerwork/report-task.txt')
-                    if (files) {
-                        scanner = readProperties file: files[0].path, defaults: [dashboardUrl:'https://sonar.softwaregroup.com']
-                    }
+                    checkstyle pattern: '.lint/lint*.xml', canRunOnFailed: true
+                    step([$class: "TapPublisher", testResults: ".lint/tap.txt", verbose: false, enableSubtests: true, planRequired: false])
+                    cobertura coberturaReportFile: 'coverage/cobertura-coverage.xml', failNoReports: false
+                    xunit(tools:[GoogleTest(deleteOutputFiles: true, failIfNotNew: true, pattern: '.lint/xunit.xml', skipNoTestFiles: true, stopProcessingIfError: false)])
+                    publishHTML([
+                        reportName: 'Code coverage',
+                        reportTitles: '',
+                        reportDir: 'coverage/lcov-report',
+                        reportFiles: 'index.html',
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true
+                    ])
+                    emailext(
+                        mimeType: 'text/html',
+                        body: '''<h1>Jenkins build ${JOB_NAME} ${BUILD_DISPLAY_NAME}</h1>
+        <h2><b>Status</b>: ${BUILD_STATUS}</h2>
+        <b>Trigger</b>:  ${CAUSE}<br>
+        <b>Job</b>: ${JOB_URL}<br>
+        <b>Summary</b>: ${BUILD_URL}<br>
+        <b>Console</b>: ${BUILD_URL}/console<br>
+        <b>Workspace</b>: ${BUILD_URL}/execution/node/4/ws<br>
+        <b>Sonar</b>: ''' + scanner.dashboardUrl + '''<br>
+        <b>Checkstyle</b>: ${CHECKSTYLE_RESULT}<br>
+        <b>Changes</b>:<pre>
+        ${CHANGES}
+        </pre>
+        <b>Tests</b>:<pre>
+        ${FILE,path=".lint/test.txt"}
+        </pre>
+        <b>npm audit</b>:${FILE,path=".lint/audit.html"}
+        ''',
+                        recipientProviders: [[$class: 'CulpritsRecipientProvider'],[$class: 'RequesterRecipientProvider']],
+                        subject: 'Build ${BUILD_STATUS} in Jenkins: ${JOB_NAME} ${BUILD_DISPLAY_NAME} (' + currentBuild.durationString +')'
+                    )
                 }
-                checkstyle pattern: '.lint/lint*.xml', canRunOnFailed: true
-                step([$class: "TapPublisher", testResults: ".lint/tap.txt", verbose: false, enableSubtests: true, planRequired: false])
-                cobertura coberturaReportFile: 'coverage/cobertura-coverage.xml', failNoReports: false
-                xunit(tools:[GoogleTest(deleteOutputFiles: true, failIfNotNew: true, pattern: '.lint/xunit.xml', skipNoTestFiles: true, stopProcessingIfError: false)])
-                publishHTML([
-                    reportName: 'Code coverage',
-                    reportTitles: '',
-                    reportDir: 'coverage/lcov-report',
-                    reportFiles: 'index.html',
-                    allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true
-                ])
-                emailext(
-                    mimeType: 'text/html',
-                    body: '''<h1>Jenkins build ${JOB_NAME} ${BUILD_DISPLAY_NAME}</h1>
-    <h2><b>Status</b>: ${BUILD_STATUS}</h2>
-    <b>Trigger</b>:  ${CAUSE}<br>
-    <b>Job</b>: ${JOB_URL}<br>
-    <b>Summary</b>: ${BUILD_URL}<br>
-    <b>Console</b>: ${BUILD_URL}/console<br>
-    <b>Workspace</b>: ${BUILD_URL}/execution/node/4/ws<br>
-    <b>Sonar</b>: ''' + scanner.dashboardUrl + '''<br>
-    <b>Checkstyle</b>: ${CHECKSTYLE_RESULT}<br>
-    <b>Changes</b>:<pre>
-    ${CHANGES}
-    </pre>
-    <b>Tests</b>:<pre>
-    ${FILE,path=".lint/test.txt"}
-    </pre>
-    <b>npm audit</b>:${FILE,path=".lint/audit.html"}
-    ''',
-                    recipientProviders: [[$class: 'CulpritsRecipientProvider'],[$class: 'RequesterRecipientProvider']],
-                    subject: 'Build ${BUILD_STATUS} in Jenkins: ${JOB_NAME} ${BUILD_DISPLAY_NAME} (' + currentBuild.durationString +')'
-                )
-            }
-            failure {
-                script {
-                    if (repoUrl.substring(0,14) == 'git@github.com') {
-                        step([
-                            $class: 'GitHubCommitStatusSetter',
-                            reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
-                            contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins'],
-                            statusResultSource: [$class: 'ConditionalStatusResultSource', results: [
-                                [$class: 'AnyBuildResult', message: 'Failed to build on Jenkins', state: 'FAILURE']
-                            ]
-                        ]])
-                    } else {
-                        updateGitlabCommitStatus name: 'build', state: 'failed'
+                failure {
+                    script {
+                        if (repoUrl.substring(0,14) == 'git@github.com') {
+                            step([
+                                $class: 'GitHubCommitStatusSetter',
+                                reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
+                                contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins'],
+                                statusResultSource: [$class: 'ConditionalStatusResultSource', results: [
+                                    [$class: 'AnyBuildResult', message: 'Failed to build on Jenkins', state: 'FAILURE']
+                                ]
+                            ]])
+                        } else {
+                            updateGitlabCommitStatus name: 'build', state: 'failed'
+                        }
                     }
+                    // https://doc.nuxeo.com/corg/jenkins-pipeline-usage/
                 }
-                // https://doc.nuxeo.com/corg/jenkins-pipeline-usage/
-            }
-            success {
-                script {
-                    if (repoUrl.substring(0,14) == 'git@github.com') {
-                        step([
-                            $class: 'GitHubCommitStatusSetter',
-                            reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
-                            contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins'],
-                            statusResultSource: [$class: 'ConditionalStatusResultSource', results: [
-                                [$class: 'AnyBuildResult', message: 'Successfully built on Jenkins', state: 'SUCCESS']
-                            ]
-                        ]])
-                    } else {
-                        updateGitlabCommitStatus name: 'build', state: 'success'
+                success {
+                    script {
+                        if (repoUrl.substring(0,14) == 'git@github.com') {
+                            step([
+                                $class: 'GitHubCommitStatusSetter',
+                                reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
+                                contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins'],
+                                statusResultSource: [$class: 'ConditionalStatusResultSource', results: [
+                                    [$class: 'AnyBuildResult', message: 'Successfully built on Jenkins', state: 'SUCCESS']
+                                ]
+                            ]])
+                        } else {
+                            updateGitlabCommitStatus name: 'build', state: 'success'
+                        }
                     }
                 }
             }

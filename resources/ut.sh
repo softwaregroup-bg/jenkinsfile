@@ -5,6 +5,12 @@ UT_PROJECT=`git config --get remote.origin.url | sed -n -r 's/.*\/(ut-.*|impl-.*
 [[ ${UT_PROJECT} =~ impl-(.*) ]] || true && UT_IMPL=${BASH_REMATCH[1]}
 [[ ${UT_PROJECT} =~ ut-(.*) ]] || true && UT_MODULE=${BASH_REMATCH[1]}
 [[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]] || true && RELEASE=${BASH_REMATCH[0]}
+# add origin/ if missing
+GIT_BRANCH=origin/${GIT_BRANCH#origin/}
+# replace / \ %2f %2F with -
+JOB_NAME=${JOB_NAME//[\/\\]/-}
+JOB_NAME=${JOB_NAME//%2f/-}
+JOB_NAME=${JOB_NAME//%2F/-}
 TAP_TIMEOUT=1000
 CONTAINER_NAME=$JOB_NAME-$BUILD_NUMBER
 UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
