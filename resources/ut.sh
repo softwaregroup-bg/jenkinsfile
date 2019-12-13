@@ -24,7 +24,7 @@ if [[ $RELEASE && "${CHANGE_ID}" = "" ]]; then
     git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
 fi
 if [ -f "prefetch.json" ]; then
-    PREFETCH=$'COPY --chown=node:node prefetch.json /app/\nRUN npm --production=false install'
+    PREFETCH=$'COPY --chown=node:node prefetch.json package.json\nRUN npm --production=false install'
 fi
 if [ -f "prefetch" ]; then
     PREFETCH=$(<prefetch)
@@ -59,7 +59,7 @@ FROM $BUILD_IMAGE
 $RUNAPK
 ${NPMRC}
 ${PREFETCH}
-COPY --chown=node:node package.json /app/
+COPY --chown=node:node package.json package.json
 RUN npm --production=false install
 COPY --chown=node:node . .
 EOF
