@@ -31,7 +31,7 @@ if [ -f ".npmrc" ]; then
     NPMRC='COPY --chown=node:node .npmrc .npmrc'
 fi
 if [ -f "lerna.json" ]; then
-    LERNA='COPY --chown=node:node lerna.json packages/*/package.json /app/'
+    LERNA='COPY --chown=node:node lerna.json packages /app/'
 fi
 
 # Create prerequisite folders
