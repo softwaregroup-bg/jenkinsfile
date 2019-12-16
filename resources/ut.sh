@@ -8,6 +8,7 @@ NPMRC=
 RUNAPK=
 UT_IMPL=
 UT_MODULE=
+LERNA=
 [[ ${UT_PROJECT} =~ impl-(.*) ]] || true && UT_IMPL=${BASH_REMATCH[1]}
 [[ ${UT_PROJECT} =~ ut-(.*) ]] || true && UT_MODULE=${BASH_REMATCH[1]}
 [[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]] || true && RELEASE=${BASH_REMATCH[0]}
@@ -28,6 +29,9 @@ if [ -f "prefetch" ]; then
 fi
 if [ -f ".npmrc" ]; then
     NPMRC='COPY --chown=node:node .npmrc .npmrc'
+fi
+if [ -f "lerna.json" ]; then
+    LERNA='COPY --chown=node:node lerna.json lerna.json'
 fi
 
 # Create prerequisite folders
@@ -55,6 +59,7 @@ docker build -t ${UT_PROJECT}:test . -f-<<EOF
 FROM $BUILD_IMAGE
 $RUNAPK
 ${NPMRC}
+${LERNA}
 ${PREFETCH}
 COPY --chown=node:node package.json package.json
 RUN npm --production=false install
