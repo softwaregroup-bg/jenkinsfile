@@ -83,14 +83,6 @@ ${FILE,path=".lint/test.txt"}
                     failure {
                         script {
                             if (repoUrl.substring(0,14) == 'git@github.com') {
-                                step([
-                                    $class: 'GitHubCommitStatusSetter',
-                                    reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
-                                    contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins'],
-                                    statusResultSource: [$class: 'ConditionalStatusResultSource', results: [
-                                        [$class: 'AnyBuildResult', message: 'Failed to build on Jenkins', state: 'FAILURE']
-                                    ]
-                                ]])
                             } else {
                                 updateGitlabCommitStatus name: 'build', state: 'failed'
                             }
@@ -100,14 +92,6 @@ ${FILE,path=".lint/test.txt"}
                     success {
                         script {
                             if (repoUrl.substring(0,14) == 'git@github.com') {
-                                step([
-                                    $class: 'GitHubCommitStatusSetter',
-                                    reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
-                                    contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins'],
-                                    statusResultSource: [$class: 'ConditionalStatusResultSource', results: [
-                                        [$class: 'AnyBuildResult', message: 'Successfully built on Jenkins', state: 'SUCCESS']
-                                    ]
-                                ]])
                             } else {
                                 updateGitlabCommitStatus name: 'build', state: 'success'
                             }
