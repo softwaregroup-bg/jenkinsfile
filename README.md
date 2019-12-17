@@ -3,6 +3,36 @@
 To use this shared library, create a file named `Jenkinsfile`
 in the root of your project with the following contents:
 
+## For modules
+
+Use this to build modules (`ut-*`):
+
+```groovy
+library identifier: 'jenkinsfile@master', retriever: modernSCM([
+    $class: 'GitSCMSource',
+    remote: 'https://github.com/softwaregroup-bg/jenkinsfile.git'
+])
+
+ut buildImage: 'softwaregroup/ut-docker'
+```
+
+## For implementations
+
+Use this to build implementations (`impl-*`):
+
+```groovy
+library identifier: 'jenkinsfile@master', retriever: modernSCM([
+    $class: 'GitSCMSource',
+    remote: 'https://github.com/softwaregroup-bg/jenkinsfile.git'
+])
+
+ut buildImage: 'softwaregroup/impl-docker',
+```
+
+## Advanced usage
+
+Use this to build also ARM image for implementations:
+
 ```groovy
 library identifier: 'jenkinsfile@master', retriever: modernSCM([
     $class: 'GitSCMSource',
@@ -10,7 +40,7 @@ library identifier: 'jenkinsfile@master', retriever: modernSCM([
 ])
 
 ut ([
-    buildImage: 'softwaregroup/ut-docker:7.0.0',
+    buildImage: 'softwaregroup/impl-docker',
     image: 'mhart/alpine-node:base-10.16.3',
     armimage: 'arm64v8/node:10.16.3-alpine'
 ])
