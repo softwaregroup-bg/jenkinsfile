@@ -12,7 +12,7 @@ LERNA=
 [[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]] || true && RELEASE=${BASH_REMATCH[0]}
 # add origin/ if missing
 GIT_BRANCH=origin/${GIT_BRANCH#origin/}
-BRANCH_NAME=origin/${BRANCH_NAME#origin/}
+BRANCH_NAME=${GIT_BRANCH}
 # replace / \ %2f %2F with -
 TAP_TIMEOUT=1000
 UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
