@@ -78,6 +78,7 @@ docker run -u node:node -i --rm \
     -e BUILD_NUMBER=$BUILD_NUMBER \
     -e UT_ENV=jenkins \
     -e UT_DB_PASS=$UT_DB_PASS \
+    -e UT_MASTER_KEY=$UT_MASTER_KEY \
     -e UT_MODULE=$UT_IMPL \
     -e GIT_URL=$GIT_URL \
     -e GIT_BRANCH=$GIT_BRANCH \

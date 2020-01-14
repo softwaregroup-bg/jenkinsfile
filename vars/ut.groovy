@@ -13,6 +13,7 @@ def call(Map params = [:]) {
                 environment {
                     JOB_TYPE = 'pipeline'
                     UT_DB_PASS = credentials('UT_DB_PASS')
+                    UT_MASTER_KEY = credentials('UT_MASTER_KEY')
                     encryptionPass = credentials('UT_DB_ENCRYPTION_PASS')
                     DOCKER = credentials('dockerPublisher')
                     BUILD_IMAGE = "${buildImage}"
