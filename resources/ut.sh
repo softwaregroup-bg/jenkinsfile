@@ -8,14 +8,19 @@ NPMRC=
 RUNAPK=
 UT_IMPL=
 LERNA=
-[[ ${UT_PROJECT} =~ impl-(.*) ]] || true && UT_IMPL=${BASH_REMATCH[1]}
+if [[ ${UT_PROJECT} =~ impl-(.*) ]]; then
+    UT_IMPL=${BASH_REMATCH[1]}
+    UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
+fi
+if [[ ${UT_PROJECT} =~ ut-(.*) ]]; then
+    UT_PREFIX=ut_${BASH_REMATCH[1]//[-\/\\]/_}_jenkins
+fi
 [[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]] || true && RELEASE=${BASH_REMATCH[0]}
 # add origin/ if missing
 GIT_BRANCH=origin/${GIT_BRANCH#origin/}
 BRANCH_NAME=${GIT_BRANCH}
 # replace / \ %2f %2F with -
 TAP_TIMEOUT=1000
-UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
 if [[ $RELEASE && "${CHANGE_ID}" = "" ]]; then
     git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
 fi
