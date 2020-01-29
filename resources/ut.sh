@@ -7,12 +7,15 @@ PREFETCH=
 NPMRC=
 RUNAPK=
 UT_IMPL=
+UT_MODULE=
 LERNA=
 if [[ ${UT_PROJECT} =~ impl-(.*) ]]; then
     UT_IMPL=${BASH_REMATCH[1]}
+    UT_MODULE=${UT_IMPL}
     UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
 fi
 if [[ ${UT_PROJECT} =~ ut-(.*) ]]; then
+    UT_MODULE=${BASH_REMATCH[1]}
     UT_PREFIX=ut_${BASH_REMATCH[1]//[-\/\\]/_}_jenkins
 fi
 [[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]] || true && RELEASE=${BASH_REMATCH[0]}
@@ -84,17 +87,17 @@ docker run -u node:node -i --rm \
     -e UT_ENV=jenkins \
     -e UT_DB_PASS=$UT_DB_PASS \
     -e UT_MASTER_KEY=$UT_MASTER_KEY \
-    -e UT_MODULE=$UT_IMPL \
+    -e UT_MODULE=$UT_MODULE \
     -e GIT_URL=$GIT_URL \
     -e GIT_BRANCH=$GIT_BRANCH \
     -e BRANCH_NAME=$BRANCH_NAME \
     -e BUILD_CAUSE=$BUILD_CAUSE \
     -e ${UT_PREFIX}_db__create__password=$UT_DB_PASS \
     -e ${UT_PREFIX}_db__connection__encryptionPass="$encryptionPass" \
-    -e ${UT_PREFIX}_db__connection__database=${UT_IMPL}-${UT_PROJECT}-${BUILD_NUMBER} \
+    -e ${UT_PREFIX}_db__connection__database=${UT_MODULE}-${UT_PROJECT}-${BUILD_NUMBER} \
     -e ${UT_PREFIX}_utAudit__db__create__password=$UT_DB_PASS \
-    -e ${UT_PREFIX}_utAudit__db__connection__database=${UT_IMPL}-audit-${UT_PROJECT}-${BUILD_NUMBER} \
-    -e ${UT_PREFIX}_utHistory__db__connection__database=${UT_IMPL}-history-${UT_PROJECT}-${BUILD_NUMBER} \
+    -e ${UT_PREFIX}_utAudit__db__connection__database=${UT_MODULE}-audit-${UT_PROJECT}-${BUILD_NUMBER} \
+    -e ${UT_PREFIX}_utHistory__db__connection__database=${UT_MODULE}-history-${UT_PROJECT}-${BUILD_NUMBER} \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     --entrypoint=/bin/bash \
