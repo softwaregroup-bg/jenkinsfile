@@ -124,7 +124,6 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
     if [ "$TAG" = "master" ]; then TAG="latest"; fi
     docker build -t ${UT_PROJECT}:$TAG . -f-<<EOF
         FROM ${UT_PROJECT}:test
-        RUN npm prune --production
 EOF
     docker build -t ${UT_PROJECT}-amd64 . -f-<<EOF
         FROM $IMAGE
