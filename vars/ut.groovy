@@ -1,6 +1,6 @@
 def call(Map params = [:]) {
     def buildImage = params.buildImage?:'softwaregroup/ut-docker:7.0.0'
-    def image = params.image?:'mhart/alpine-node:base-10.16.3'
+    def image = params.image?:'mhart/alpine-node:slim-12.16.3'
     def armimage = params.armimage?:''
     def scanner = [dashboardUrl:'https://sonar.softwaregroup.com']
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
