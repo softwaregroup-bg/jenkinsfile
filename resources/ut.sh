@@ -101,7 +101,7 @@ docker run -u node:node -i --rm \
     -e ${UT_PREFIX}_utAudit__db__connection__database=${UT_MODULE}-audit-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER} \
     -e ${UT_PREFIX}_utHistory__db__connection__database=${UT_MODULE}-history-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER} \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
-    -e ${UT_PREFIX}_k8s__user=$DOCKER_USR \
+    -e ${UT_PREFIX}_k8s__username=$DOCKER_USR \
     -e ${UT_PREFIX}_k8s__password=$DOCKER_PSW \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     --entrypoint=/bin/bash \
