@@ -94,6 +94,8 @@ docker run -u node:node -i --rm \
     -e GIT_BRANCH=$GIT_BRANCH \
     -e BRANCH_NAME=$BRANCH_NAME \
     -e BUILD_CAUSE=$BUILD_CAUSE \
+    -e DOCKER_USR=$DOCKER_USR \
+    -e DOCKER_PSW=$DOCKER_PSW \
     -e ${UT_PREFIX}_db__create__password=$UT_DB_PASS \
     -e ${UT_PREFIX}_db__connection__encryptionPass="$encryptionPass" \
     -e ${UT_PREFIX}_db__connection__database=${UT_MODULE}-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER} \
@@ -101,8 +103,6 @@ docker run -u node:node -i --rm \
     -e ${UT_PREFIX}_utAudit__db__connection__database=${UT_MODULE}-audit-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER} \
     -e ${UT_PREFIX}_utHistory__db__connection__database=${UT_MODULE}-history-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER} \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
-    -e ${UT_PREFIX}_k8s__username=$DOCKER_USR \
-    -e ${UT_PREFIX}_k8s__password=$DOCKER_PSW \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     --entrypoint=/bin/bash \
     ${UT_PROJECT}:test -c "(git checkout -- .dockerignore || true) && npm run jenkins"
