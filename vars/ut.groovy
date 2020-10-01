@@ -64,7 +64,7 @@ def call(Map params = [:]) {
 <h2><b>Status</b>: ${BUILD_STATUS}</h2>
 <b>Trigger</b>:  ${CAUSE}<br>
 <b>Job</b>: ${JOB_URL}<br>
-<b>Branch</b>: ''' + repoUrl.replaceAll(/^git@|.git$/, '').replace(':', '/') + '''/tree/${GIT_BRANCH}<br>
+<b>Branch</b>: ''' + repoUrl.replaceAll(/^git@|.git$/, '').replace(':', '/') + '''/tree/''' + env.GIT_BRANCH + '''<br>
 <b>MR/PR</b>: ${CHANGE_URL}<br>
 <b>Summary</b>: ${BUILD_URL}<br>
 <b>Console</b>: ${BUILD_URL}console<br>
