@@ -9,6 +9,10 @@ RUNAPK=
 UT_IMPL=
 UT_MODULE=
 LERNA=
+DBSUFFIX=
+if [[ ${CHANGE_ID} ]]; then
+    DBSUFFIX=-${CHANGE_ID}
+fi
 if [[ ${UT_PROJECT} =~ impl-(.*) ]]; then
     UT_IMPL=${BASH_REMATCH[1]}
     UT_MODULE=${UT_IMPL}
@@ -98,10 +102,10 @@ docker run -u node:node -i --rm \
     -e DOCKER_PSW=$DOCKER_PSW \
     -e ${UT_PREFIX}_db__create__password=$UT_DB_PASS \
     -e ${UT_PREFIX}_db__connection__encryptionPass="$encryptionPass" \
-    -e ${UT_PREFIX}_db__connection__database=${UT_MODULE}-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER} \
+    -e ${UT_PREFIX}_db__connection__database=${UT_MODULE}-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER}${DBSUFFIX} \
     -e ${UT_PREFIX}_utAudit__db__create__password=$UT_DB_PASS \
-    -e ${UT_PREFIX}_utAudit__db__connection__database=${UT_MODULE}-audit-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER} \
-    -e ${UT_PREFIX}_utHistory__db__connection__database=${UT_MODULE}-history-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER} \
+    -e ${UT_PREFIX}_utAudit__db__connection__database=${UT_MODULE}-audit-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER}${DBSUFFIX} \
+    -e ${UT_PREFIX}_utHistory__db__connection__database=${UT_MODULE}-history-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER}${DBSUFFIX} \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     --entrypoint=/bin/bash \
