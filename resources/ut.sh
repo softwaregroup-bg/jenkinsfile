@@ -128,10 +128,11 @@ docker run -u node:node -i --rm \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     --entrypoint=/bin/bash \
     ${UT_PROJECT}:test -c "(git checkout -- .dockerignore || true) && npm run jenkins"
-docker run -it --rm --cap-add=SYS_ADMIN \
+docker run -u node:node -i --rm \
+    --cap-add=SYS_ADMIN \
     -v "$(pwd)/.lint:/app/.lint" \
     nexus-dev.softwaregroup.com:5001/softwaregroup/capture-website --output=./lint/sonar.png --width=1067 --height=858 --scale-factor=0.6 \
-    https://sonar.softwaregroup.com/dashboard?id=${UT_PROJECT}%3A${GIT_BRANCH//[\/\\]/%3F}
+    https://sonar.softwaregroup.com/dashboard?id=${UT_PROJECT}%3A${GIT_BRANCH//[\/\\]/%2F}
 if [[ $RELEASE && ${UT_IMPL} ]]; then
     TAG=${RELEASE//[\/\\]/-}
     if [ "$TAG" = "master" ]; then TAG="latest"; fi

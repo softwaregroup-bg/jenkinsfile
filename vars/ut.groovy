@@ -63,6 +63,9 @@ def call(Map params = [:]) {
                             mimeType: 'text/html',
                             body: '''<h1>Jenkins build ''' + repoUrl.replaceAll(/^[^\/]*\/|.git$/, "") + ''' ${BUILD_DISPLAY_NAME}</h1>
 <h2><b>Status</b>: ${BUILD_STATUS}</h2>
+<div style="float:right; width: 50%;">
+    <img src="cid:sonar.png" />
+</div>
 <b>Trigger</b>:  ${CAUSE}<br>
 <b>Job</b>: ${JOB_URL}<br>
 <b>Branch</b>: ''' + repoUrl.replaceAll(/^git@|.git$/, '').replace(':', '/') + '''/tree/''' + env.GIT_BRANCH + '''<br>
