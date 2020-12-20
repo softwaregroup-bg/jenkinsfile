@@ -1,6 +1,6 @@
 def call(Map params = [:]) {
-    def buildImage = params.buildImage?:'softwaregroup/ut-docker:7.0.0'
-    def image = params.image?:'nexus-dev.softwaregroup.com:5000/softwaregroup/alpine-node:slim-12.16.3'
+    def buildImage = params.buildImage?:'nexus-dev.softwaregroup.com:5000/softwaregroup/ut-docker'
+    def image = params.image?:'nexus-dev.softwaregroup.com:5000/softwaregroup/alpine-node:slim-14.15.3'
     def armimage = params.armimage?:''
     def scanner = [dashboardUrl:'https://sonar.softwaregroup.com']
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
@@ -63,6 +63,9 @@ def call(Map params = [:]) {
                             mimeType: 'text/html',
                             body: '''<h1>Jenkins build ''' + repoUrl.replaceAll(/^[^\/]*\/|.git$/, "") + ''' ${BUILD_DISPLAY_NAME}</h1>
 <h2><b>Status</b>: ${BUILD_STATUS}</h2>
+<div style="float:right; width: 50%;">
+    <img src="cid:sonar.png" />
+</div>
 <b>Trigger</b>:  ${CAUSE}<br>
 <b>Job</b>: ${JOB_URL}<br>
 <b>Branch</b>: ''' + repoUrl.replaceAll(/^git@|.git$/, '').replace(':', '/') + '''/tree/''' + env.GIT_BRANCH + '''<br>
@@ -81,6 +84,7 @@ ${FILE,path=".lint/test.txt"}
 <b>npm audit</b>:${FILE,path=".lint/audit.html"}
             ''',
                             recipientProviders: [[$class: 'CulpritsRecipientProvider'],[$class: 'RequesterRecipientProvider']],
+                            attachmentsPattern: '.lint/sonar*.png',
                             subject: 'Build ${BUILD_STATUS} in Jenkins: ' + repoUrl.replaceAll(/^[^\/]*\/|.git$/, "") + ' ${BUILD_DISPLAY_NAME} (' + currentBuild.durationString +')'
                         )
                     }

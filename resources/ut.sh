@@ -77,6 +77,23 @@ COPY --chown=node:node package.json package.json
 RUN npm --production=false install
 COPY --chown=node:node . .
 EOF
+docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.com:5000/softwaregroup/sonar-scanner:3.2.0-alpine \
+  -c "sonar-scanner \
+  -Dsonar.host.url=https://sonar.softwaregroup.com/ \
+  -Dsonar.projectKey=${UT_PROJECT} \
+  -Dsonar.projectName=${UT_PROJECT} \
+  -Dsonar.projectVersion=1 \
+  -Dsonar.projectBaseDir=/app \
+  -Dsonar.sources=. \
+  -Dsonar.inclusions=**/*.js \
+  -Dsonar.exclusions=node_modules/**/*,coverage/**/*,test/**/*,tap-snapshots/**/* \
+  -Dsonar.tests=. \
+  -Dsonar.test.inclusions=test/**/*.js,**/*.test.js \
+  -Dsonar.test.exclusions=node_modules/**/*,coverage/**/* \
+  -Dsonar.language=js \
+  -Dsonar.branch=${GIT_BRANCH} \
+  -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+  && chown -R $(id -u):$(id -g) /app/.scannerwork"
 docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:test /bin/sh -c "npm ls > .lint/npm-ls.txt" || true
 docker run -u node:node -i --rm \
     -v ~/.ssh:/home/node/.ssh:ro \
@@ -111,23 +128,11 @@ docker run -u node:node -i --rm \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     --entrypoint=/bin/bash \
     ${UT_PROJECT}:test -c "(git checkout -- .dockerignore || true) && npm run jenkins"
-docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.com:5000/softwaregroup/sonar-scanner:3.2.0-alpine \
-  -c "sonar-scanner \
-  -Dsonar.host.url=https://sonar.softwaregroup.com/ \
-  -Dsonar.projectKey=${UT_PROJECT} \
-  -Dsonar.projectName=${UT_PROJECT} \
-  -Dsonar.projectVersion=1 \
-  -Dsonar.projectBaseDir=/app \
-  -Dsonar.sources=. \
-  -Dsonar.inclusions=**/*.js \
-  -Dsonar.exclusions=node_modules/**/*,coverage/**/*,test/**/*,tap-snapshots/**/* \
-  -Dsonar.tests=. \
-  -Dsonar.test.inclusions=test/**/*.js,**/*.test.js \
-  -Dsonar.test.exclusions=node_modules/**/*,coverage/**/* \
-  -Dsonar.language=js \
-  -Dsonar.branch=${GIT_BRANCH} \
-  -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-  && chown -R $(id -u):$(id -g) /app/.scannerwork"
+docker run -u node:node -i --rm \
+    --cap-add=SYS_ADMIN \
+    -v "$(pwd)/.lint:/app/.lint" \
+    nexus-dev.softwaregroup.com:5001/softwaregroup/capture-website --output=.lint/sonar.png --width=1067 --height=858 --scale-factor=0.6 \
+    https://sonar.softwaregroup.com/dashboard?id=${UT_PROJECT}%3A${GIT_BRANCH//[\/\\]/%2F}
 if [[ $RELEASE && ${UT_IMPL} ]]; then
     TAG=${RELEASE//[\/\\]/-}
     if [ "$TAG" = "master" ]; then TAG="latest"; fi
