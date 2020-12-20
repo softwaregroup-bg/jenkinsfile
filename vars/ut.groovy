@@ -84,7 +84,7 @@ ${FILE,path=".lint/test.txt"}
 <b>npm audit</b>:${FILE,path=".lint/audit.html"}
             ''',
                             recipientProviders: [[$class: 'CulpritsRecipientProvider'],[$class: 'RequesterRecipientProvider']],
-                            attachmentsPattern: './lint/sonar*.png',
+                            attachmentsPattern: '.lint/sonar*.png',
                             subject: 'Build ${BUILD_STATUS} in Jenkins: ' + repoUrl.replaceAll(/^[^\/]*\/|.git$/, "") + ' ${BUILD_DISPLAY_NAME} (' + currentBuild.durationString +')'
                         )
                     }
