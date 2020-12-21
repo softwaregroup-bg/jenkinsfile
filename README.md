@@ -13,7 +13,7 @@ library identifier: 'jenkinsfile@master', retriever: modernSCM([
     remote: 'https://github.com/softwaregroup-bg/jenkinsfile.git'
 ])
 
-ut buildImage: 'softwaregroup/ut-docker'
+ut buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/ut-docker'
 ```
 
 ## For implementations
@@ -26,7 +26,24 @@ library identifier: 'jenkinsfile@master', retriever: modernSCM([
     remote: 'https://github.com/softwaregroup-bg/jenkinsfile.git'
 ])
 
-ut buildImage: 'softwaregroup/impl-docker',
+ut buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/impl-docker'
+```
+
+It will build implementation image based on
+[mhart/alpine-node:slim-14.15.3](https://hub.docker.com/r/mhart/alpine-node/tags?page=1&name=slim-14.15.3)
+
+To build for node 12, use:
+
+```groovy
+library identifier: 'jenkinsfile@master', retriever: modernSCM([
+    $class: 'GitSCMSource',
+    remote: 'https://github.com/softwaregroup-bg/jenkinsfile.git'
+])
+
+ut(
+    buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/impl-docker',
+    image: 'nexus-dev.softwaregroup.com:5000/softwaregroup/alpine-node:slim-12.16.3'
+)
 ```
 
 ## Advanced usage
@@ -41,8 +58,8 @@ library identifier: 'jenkinsfile@master', retriever: modernSCM([
 
 ut ([
     buildImage: 'softwaregroup/impl-docker',
-    image: 'mhart/alpine-node:base-10.16.3',
-    armimage: 'arm64v8/node:10.16.3-alpine'
+    image: 'mhart/alpine-node:base-14.15.3',
+    armimage: 'arm64v8/node:14.15.3-alpine'
 ])
 ```
 
