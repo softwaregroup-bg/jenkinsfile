@@ -53,7 +53,7 @@ def call(Map params = [:]) {
                                 withCredentials([usernamePassword(credentialsId: 'temp_nexus', passwordVariable: 'PASS', usernameVariable: 'USERNAME')]) {
 
                                     bat '''
-curl -X POST "https://repository.softwaregroup.com/service/rest/v1/components?repository=${projectName.replaceAll(/^\w+-/, '')}" \
+curl -X POST "https://repository.softwaregroup.com/service/rest/v1/components?repository=" + projectName.replaceAll(/^\w+-/, '') \
     -H "accept: application/json" \
     -H "Content-Type: multipart/form-data" \
     -F "maven2.groupId=${projectName}" \
