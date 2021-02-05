@@ -29,11 +29,11 @@ def call(Map params = [:]) {
                         pkgjson = readJSON file: 'package.json'
                         repoUrl = pkgjson.repository.url
                         currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.GIT_BRANCH
-                    }
-                    ansiColor('xterm') {
-                        sh(libraryResource('ut.sh'))
-                        pkgjson = readJSON file: 'package.json'
-                        projectVersion = pkgjson.version
+                        ansiColor('xterm') {
+                            sh(libraryResource('ut.sh'))
+                            pkgjson = readJSON file: 'package.json'
+                            projectVersion = pkgjson.version
+                        }
                     }
                 }
             }
