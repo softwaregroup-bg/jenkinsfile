@@ -6,7 +6,7 @@ def call(Map params = [:]) {
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
     def repoUrl
     String projectVersion
-    boolean isWindows = params.isWindows.toBoolean()?:false
+    def isWindows = params.isWindows?:''
 
     pipeline {
         agent { label 'implementation-slaves' }
@@ -41,7 +41,7 @@ def call(Map params = [:]) {
                     stage('windows'){
                         when { environment name: 'isWindows', value: 'true' }
                         environment {
-                            isWindows = isWindows
+                            isWindows = true
                         }
                         agent { label 'integration-windows' }
                         steps{
