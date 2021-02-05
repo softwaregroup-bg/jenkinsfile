@@ -59,10 +59,10 @@ curl -X POST "https://repository.softwaregroup.com/service/rest/v1/components?re
     -F "maven2.groupId=${projectName}" \
     -F "maven2.artifactId=${projectName}" \
     -F "maven2.version=${projectVersion}" \
+    -u "${USERNAME}:${PASS}" \
     -F "maven2.generate-pom=false" \
     -F "maven2.asset1=@${projectName}.7z;type=application/x-7z-compressed" \
     -F "maven2.asset1.extension=7z"'''
-    -u USERNAME:PASS
                                 }
                                 deleteDir()
                             }
