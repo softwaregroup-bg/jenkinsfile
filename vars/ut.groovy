@@ -36,6 +36,8 @@ def call(Map params = [:]) {
                         projectVersion = pkgjson.version
                     }
                 }
+            }
+
                 if (isWindows){
                     stage('windows'){
                         agent { label 'integration-windows' }
@@ -69,6 +71,7 @@ curl -X POST "https://repository.softwaregroup.com/service/rest/v1/components?re
                         }
                     }
                 }
+        }
                 post {
                     always {
                             sh 'docker rmi -f $(docker images -q -f "dangling=true") || true'
@@ -147,5 +150,3 @@ ${FILE,path=".lint/test.txt"}
                 }
             }
         }
-    }
-}
