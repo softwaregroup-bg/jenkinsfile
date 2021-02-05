@@ -5,6 +5,9 @@ def call(Map params = [:]) {
     def scanner = [dashboardUrl:'https://sonar.softwaregroup.com']
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
     def repoUrl
+    String projectVersion
+    boolean isWindows = params.isWindows.toBoolean()?:false
+
     pipeline {
         agent { label 'implementation-slaves' }
         stages {
@@ -29,22 +32,58 @@ def call(Map params = [:]) {
                     }
                     ansiColor('xterm') {
                         sh(libraryResource('ut.sh'))
+                        pkgjson = readJSON file: 'package.json'
+                        projectVersion = pkgjson.version
+                    }
+                }
+                if (isWindows){
+                    stage('windows'){
+                        agent { label 'integration-windows' }
+                        steps{
+                            script{
+                                String projectName = repoUrl.replaceAll(/^[^\/]*\/|.git$/, "")
+                                nodejs('nodejs_12.16.2'){
+                                    dir(projectName){
+                                        bat 'npm init -y'
+                                        bat 'npm version ' + projectVersion
+                                        bat 'npm install ' + projectName  + '@' + projectVersion + ' --registry=https://nexus.softwaregroup.com/repository/npm-all'
+                                    }
+                                }
+                                bat '7z.exe a -t7z ' + projectName + ' ' + projectName + ' -xr!false'
+                                withCredentials([usernamePassword(credentialsId: 'temp_nexus', passwordVariable: 'PASS', usernameVariable: 'USERNAME')]) {
+
+                                    bat '''
+curl -X POST "https://repository.softwaregroup.com/service/rest/v1/components?repository=${projectName.replaceAll(/^\w+-/, '')}" \
+    -H "accept: application/json" \
+    -H "Content-Type: multipart/form-data" \
+    -F "maven2.groupId=${projectName}" \
+    -F "maven2.artifactId=${projectName}" \
+    -F "maven2.version=${projectVersion}" \
+    -F "maven2.generate-pom=false" \
+    -F "maven2.asset1=@${projectName}.7z;type=application/x-7z-compressed" \
+    -F "maven2.asset1.extension=7z"'''
+    -u USERNAME:PASS
+                                }
+                                deleteDir()
+                            }
+                        }
                     }
                 }
                 post {
                     always {
-                        sh 'docker rmi -f $(docker images -q -f "dangling=true") || true'
-                        script {
-                            def files = findFiles(glob:'.lint/result.json')
-                            if (files) {
-                                pkg = readJSON file: files[0].path
-                                currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.GIT_BRANCH + ' : ' + pkg.version
+                            sh 'docker rmi -f $(docker images -q -f "dangling=true") || true'
+                            script {
+                                def files = findFiles(glob:'.lint/result.json')
+                                if (files) {
+                                    pkg = readJSON file: files[0].path
+                                    currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.GIT_BRANCH + ' : ' + pkg.version
+                                }
+                                files = findFiles(glob:'.scannerwork/report-task.txt')
+                                if (files) {
+                                    scanner = readProperties file: files[0].path, defaults: [dashboardUrl:'https://sonar.softwaregroup.com']
+                                }
                             }
-                            files = findFiles(glob:'.scannerwork/report-task.txt')
-                            if (files) {
-                                scanner = readProperties file: files[0].path, defaults: [dashboardUrl:'https://sonar.softwaregroup.com']
-                            }
-                        }
+
                         checkstyle pattern: '.lint/lint*.xml', canRunOnFailed: true
                         step([$class: "TapPublisher", testResults: ".lint/tap.txt", verbose: false, enableSubtests: true, planRequired: false])
                         cobertura coberturaReportFile: 'coverage/cobertura-coverage.xml', failNoReports: false
