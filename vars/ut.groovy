@@ -38,8 +38,11 @@ def call(Map params = [:]) {
                 }
             }
 
-                if (isWindows){
                     stage('windows'){
+                        when { environment name: 'isWindows', value: 'true' }
+                        environment {
+                            isWindows = isWindows
+                        }
                         agent { label 'integration-windows' }
                         steps{
                             script{
@@ -71,7 +74,6 @@ curl -X POST "https://repository.softwaregroup.com/service/rest/v1/components?re
                         }
                     }
                 }
-        }
                 post {
                     always {
                             sh 'docker rmi -f $(docker images -q -f "dangling=true") || true'
