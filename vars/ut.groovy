@@ -41,7 +41,7 @@ def call(Map params = [:]) {
                     stage('windows'){
                         when { environment name: 'isWindows', value: 'true' }
                         environment {
-                            isWindows = true
+                            isWindows = "true"
                         }
                         agent { label 'integration-windows' }
                         steps{
