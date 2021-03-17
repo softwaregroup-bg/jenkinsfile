@@ -149,6 +149,7 @@ EOF
             FROM $ARMIMAGE
             COPY --from=${UT_PROJECT}:$TAG /app /app
             WORKDIR /app
+            ENV PUPPETEER_EXECUTABLE_PATH=/app/bin/chromium-browser
             ENTRYPOINT ["node", "index.js"]
             CMD ["server"]
 EOF
