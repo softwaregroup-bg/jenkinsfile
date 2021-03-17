@@ -137,6 +137,10 @@ EOF
     docker build -t ${UT_PROJECT}-amd64 . -f-<<EOF
         FROM $IMAGE
         RUN apk add --no-cache tzdata
+
+        RUN apk add --no-cache chromium
+        ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
         COPY --from=${UT_PROJECT}:$TAG /app /app
         WORKDIR /app
         COPY dist dist
@@ -149,7 +153,6 @@ EOF
             FROM $ARMIMAGE
             COPY --from=${UT_PROJECT}:$TAG /app /app
             WORKDIR /app
-            ENV PUPPETEER_EXECUTABLE_PATH=/app/bin/chromium-browser
             ENTRYPOINT ["node", "index.js"]
             CMD ["server"]
 EOF
