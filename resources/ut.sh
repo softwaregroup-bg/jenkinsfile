@@ -97,6 +97,7 @@ docker run -u node:node -i --rm \
     -e UT_ENV=jenkins \
     -e UT_DB_PASS=$UT_DB_PASS \
     -e UT_MASTER_KEY=$UT_MASTER_KEY \
+    -e CHROMATIC_PROJECT_TOKEN=$CHROMATIC_PROJECT_TOKEN \
     -e UT_MODULE=$UT_MODULE \
     -e GIT_URL=$GIT_URL \
     -e GIT_BRANCH=$GIT_BRANCH \
