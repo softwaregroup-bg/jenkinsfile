@@ -4,6 +4,7 @@ set -e
 UT_PROJECT=`git config --get remote.origin.url | sed -n -r 's/.*\/(ut-.*|impl-.*|.*-ut).git/\1/p'`
 RELEASE=
 PREFETCH=
+PREFETCH_PROD=
 NPMRC=
 RUNAPK=
 UT_IMPL=
@@ -36,6 +37,9 @@ if [ -f "prefetch.json" ]; then
 fi
 if [ -f "prefetch" ]; then
     PREFETCH=$(<prefetch)
+fi
+if [ -f "prefetch_prod" ]; then
+    PREFETCH_PROD=$(<prefetch_prod)
 fi
 if [ -f ".npmrc" ]; then
     NPMRC='COPY --chown=node:node .npmrc .npmrc'
@@ -137,6 +141,7 @@ EOF
     docker build -t ${UT_PROJECT}-amd64 . -f-<<EOF
         FROM $IMAGE
         RUN apk add --no-cache tzdata
+        ${PREFETCH_PROD}
         COPY --from=${UT_PROJECT}:$TAG /app /app
         WORKDIR /app
         COPY dist dist
