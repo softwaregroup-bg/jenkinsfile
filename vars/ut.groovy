@@ -81,7 +81,8 @@ def call(Map params = [:]) {
                         publishHTML([
                             reportName: 'Bundle analyzer',
                             reportTitles: 'Bundle analyzer',
-                            reportFiles: '.lint/bundle.html',
+                            reportDir: '.lint',
+                            reportFiles: 'bundle.html',
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
                             keepAll: true
