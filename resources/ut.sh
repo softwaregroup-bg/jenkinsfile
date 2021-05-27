@@ -143,9 +143,10 @@ EOF
         FROM $IMAGE
         RUN apk add --no-cache tzdata
         ${PREFETCH_PROD}
-        COPY --from=${UT_PROJECT}:$TAG /app /app
+        USER node
+        COPY --chown=node:node --from=${UT_PROJECT}:$TAG /app /app
         WORKDIR /app
-        COPY dist dist
+        COPY --chown=node:node dist dist
         ENTRYPOINT ["node", "index.js"]
         CMD ["server"]
 EOF
@@ -153,8 +154,10 @@ EOF
     if [ "${ARMIMAGE}" ]; then
         docker build -t ${UT_PROJECT}-arm64 . -f-<<EOF
             FROM $ARMIMAGE
-            COPY --from=${UT_PROJECT}:$TAG /app /app
+            USER node
+            COPY --chown=node:node --from=${UT_PROJECT}:$TAG /app /app
             WORKDIR /app
+            COPY --chown=node:node dist dist
             ENTRYPOINT ["node", "index.js"]
             CMD ["server"]
 EOF
