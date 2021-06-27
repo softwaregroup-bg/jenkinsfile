@@ -143,6 +143,7 @@ EOF
         FROM $IMAGE
         RUN apk add --no-cache tzdata
         ${PREFETCH_PROD}
+        RUN addgroup -S node && adduser -S -G node node && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
         USER node
         COPY --chown=node:node --from=${UT_PROJECT}:$TAG /app /app
         WORKDIR /app
@@ -154,6 +155,7 @@ EOF
     if [ "${ARMIMAGE}" ]; then
         docker build -t ${UT_PROJECT}-arm64 . -f-<<EOF
             FROM $ARMIMAGE
+            RUN addgroup -S node && adduser -S -G node node && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             USER node
             COPY --chown=node:node --from=${UT_PROJECT}:$TAG /app /app
             WORKDIR /app
