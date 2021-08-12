@@ -118,7 +118,7 @@ docker run -u node:node -i --rm \
     ${UT_PROJECT}:test -c "(git checkout -- .dockerignore || true) && npm run jenkins"
 docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.com:5000/softwaregroup/sonar-scanner:3.2.0-alpine \
   -c "sonar-scanner \
-  -Dsonar.host.url=https://192.168.133.195/ \
+  -Dsonar.host.url=http://192.168.133.195/ \
   -Dsonar.projectKey=${UT_PROJECT} \
   -Dsonar.projectName=${UT_PROJECT} \
   -Dsonar.projectVersion=1 \
@@ -129,7 +129,7 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.c
   -Dsonar.tests=. \
   -Dsonar.test.inclusions=test/**/*.js,**/*.test.js,**/*.test.ts,**/*.test.tsx \
   -Dsonar.test.exclusions=node_modules/**/*,coverage/**/* \
-  -Dsonar.branch=${GIT_BRANCH} \
+  -Dsonar.branch.name=${GIT_BRANCH} \
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
   && chown -R $(id -u):$(id -g) /app/.scannerwork"
 if [[ $RELEASE && ${UT_IMPL} ]]; then
