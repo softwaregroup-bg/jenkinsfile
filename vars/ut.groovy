@@ -46,7 +46,7 @@ def call(Map params = [:]) {
                                 scanner = readProperties file: files[0].path, defaults: [dashboardUrl:'https://sonar.softwaregroup.com']
                             }
                         }
-                        checkstyle pattern: '.lint/lint*.xml', canRunOnFailed: true
+                        recordIssues enabledForFailure: true, ignoreFailedBuilds: false, tools: [checkStyle(pattern: '.lint/lint*.xml')]
                         step([$class: "TapPublisher", testResults: ".lint/tap.txt", verbose: false, enableSubtests: true, planRequired: false])
                         cobertura coberturaReportFile: 'coverage/cobertura-coverage.xml', failNoReports: false
                         perfReport sourceDataFiles: '.lint/load/*.csv', failBuildIfNoResultFile: false, compareBuildPrevious: true
