@@ -29,7 +29,7 @@ GIT_BRANCH=origin/${GIT_BRANCH#origin/}
 BRANCH_NAME=${GIT_BRANCH}
 # replace / \ %2f %2F with -
 TAP_TIMEOUT=1000
-TEST_IMAGE_TAG=${BUILD_NUMBER}${DBSUFFIX}
+TEST_IMAGE_TAG=test-${BUILD_NUMBER}${DBSUFFIX}
 if [[ $RELEASE && "${CHANGE_ID}" = "" ]]; then
     git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
 fi
