@@ -29,6 +29,7 @@ GIT_BRANCH=origin/${GIT_BRANCH#origin/}
 BRANCH_NAME=${GIT_BRANCH}
 # replace / \ %2f %2F with -
 TAP_TIMEOUT=1000
+TEST_IMAGE_TAG=test-${BUILD_NUMBER}${DBSUFFIX}
 if [[ $RELEASE && "${CHANGE_ID}" = "" ]]; then
     git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
 fi
@@ -71,7 +72,7 @@ END
 )
 fi
 
-docker build -t ${UT_PROJECT}:test . -f-<<EOF
+docker build -t ${UT_PROJECT}:${TEST_IMAGE_TAG} . -f-<<EOF
 FROM $BUILD_IMAGE
 $RUNAPK
 ${NPMRC}
@@ -81,7 +82,7 @@ COPY --chown=node:node package.json package.json
 RUN npm --production=false install
 COPY --chown=node:node . .
 EOF
-docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:test /bin/sh -c "npm ls > .lint/npm-ls.txt" || true
+docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls > .lint/npm-ls.txt" || true
 docker run -u node:node -i --rm \
     -v ~/.ssh:/home/node/.ssh:ro \
     -v ~/.npmrc:/home/node/.npmrc:ro \
@@ -117,7 +118,7 @@ docker run -u node:node -i --rm \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     --entrypoint=/bin/bash \
-    ${UT_PROJECT}:test -c "(git checkout -- .dockerignore || true) && npm run jenkins"
+    ${UT_PROJECT}:${TEST_IMAGE_TAG} -c "(git checkout -- .dockerignore || true) && npm run jenkins"
 docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.com:5000/softwaregroup/sonar-scanner:3.2.0-alpine \
   -c "sonar-scanner \
   -Dsonar.host.url=https://sonar.softwaregroup.com/ \
@@ -138,7 +139,7 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
     TAG=${RELEASE//[\/\\]/-}
     if [ "$TAG" = "master" ]; then TAG="latest"; fi
     docker build -t ${UT_PROJECT}:$TAG . -f-<<EOF
-        FROM ${UT_PROJECT}:test
+        FROM ${UT_PROJECT}:${TEST_IMAGE_TAG}
         RUN npm prune --production
 EOF
     docker build -t ${UT_PROJECT}-amd64 . -f-<<EOF
@@ -181,6 +182,9 @@ EOF
         docker rmi ${UT_PROJECT}:$TAG ${UT_PROJECT}-amd64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
     fi
 fi
+
+docker rmi ${UT_PROJECT}:${TEST_IMAGE_TAG}
+
 sleep 30
 docker run -u node:node -i --rm \
     --cap-add=SYS_ADMIN \

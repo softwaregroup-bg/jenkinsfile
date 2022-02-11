@@ -117,23 +117,6 @@ ${FILE,path=".lint/test.txt"}
                             subject: 'Build ${BUILD_STATUS} in Jenkins: ' + repoUrl.replaceAll(/^[^\/]*\/|.git$/, "") + ' ${BUILD_DISPLAY_NAME} (' + currentBuild.durationString +')'
                         )
                     }
-                    failure {
-                        script {
-                            if (repoUrl.substring(0,14) == 'git@github.com') {
-                            } else {
-                                updateGitlabCommitStatus name: 'build', state: 'failed'
-                            }
-                        }
-                        // https://doc.nuxeo.com/corg/jenkins-pipeline-usage/
-                    }
-                    success {
-                        script {
-                            if (repoUrl.substring(0,14) == 'git@github.com') {
-                            } else {
-                                updateGitlabCommitStatus name: 'build', state: 'success'
-                            }
-                        }
-                    }
                 }
             }
         }
