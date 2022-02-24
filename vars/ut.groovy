@@ -52,7 +52,7 @@ def call(Map params = [:]) {
                         step([$class: "TapPublisher", testResults: ".lint/tap.txt", verbose: false, enableSubtests: true, planRequired: false])
                         cobertura coberturaReportFile: 'coverage/cobertura-coverage.xml', failNoReports: false
                         perfReport sourceDataFiles: '.lint/load/*.csv', failBuildIfNoResultFile: false, compareBuildPrevious: true
-                        xunit(tools:[GoogleTest(deleteOutputFiles: true, failIfNotNew: true, pattern: '.lint/xunit.xml', skipNoTestFiles: true, stopProcessingIfError: false)])
+                        xunit(tools:[GoogleTest(deleteOutputFiles: true, failIfNotNew: true, pattern: '.lint/*unit.xml', skipNoTestFiles: true, stopProcessingIfError: false)])
                         publishHTML([
                             reportName: 'Code coverage',
                             reportTitles: '',
