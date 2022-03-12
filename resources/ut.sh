@@ -59,7 +59,7 @@ do
     mkdir $item
 done
 
-if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut)-docker.*$ ]]; then
+if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut)-(docker|gallium).*$ ]]; then
     RUNAPK=$(cat <<END
 RUN set -xe\
  && apk add --no-cache bash git openssh python make g++\

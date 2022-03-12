@@ -13,7 +13,7 @@ library identifier: 'jenkinsfile@master', retriever: modernSCM([
     remote: 'https://github.com/softwaregroup-bg/jenkinsfile.git'
 ])
 
-ut buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/ut-docker'
+ut buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/ut-gallium'
 ```
 
 ## For implementations
@@ -26,7 +26,7 @@ library identifier: 'jenkinsfile@master', retriever: modernSCM([
     remote: 'https://github.com/softwaregroup-bg/jenkinsfile.git'
 ])
 
-ut buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/impl-docker'
+ut buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/impl-gallium'
 ```
 
 It will build implementation image based on
@@ -41,7 +41,7 @@ library identifier: 'jenkinsfile@master', retriever: modernSCM([
 ])
 
 ut(
-    buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/impl-docker',
+    buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/impl-gallium',
     image: 'nexus-dev.softwaregroup.com:5000/softwaregroup/alpine-node:slim-12.16.3'
 )
 ```
@@ -57,7 +57,7 @@ library identifier: 'jenkinsfile@master', retriever: modernSCM([
 ])
 
 ut ([
-    buildImage: 'softwaregroup/impl-docker',
+    buildImage: 'softwaregroup/impl-gallium',
     image: 'mhart/alpine-node:base-14.15.3',
     armimage: 'arm64v8/node:14.15.3-alpine'
 ])
