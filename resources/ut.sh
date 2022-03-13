@@ -62,7 +62,7 @@ done
 if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut)-(docker|gallium).*$ ]]; then
     RUNAPK=$(cat <<END
 RUN set -xe\
- && apk add --no-cache bash git openssh python make g++\
+ && apt install git openssh-client python3 make g++ tzdata \
  && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v\
  && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
 WORKDIR /app
@@ -146,7 +146,7 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
 EOF
     docker build -t ${UT_PROJECT}-amd64 . -f-<<EOF
         FROM $IMAGE
-        RUN apk add --no-cache tzdata
+        RUN apt install tzdata
         ${PREFETCH_PROD}
         RUN addgroup -S node && adduser -S -G node node && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
         USER node
@@ -160,7 +160,7 @@ EOF
     if [ "${ARMIMAGE}" ]; then
         docker build -t ${UT_PROJECT}-arm64 . -f-<<EOF
             FROM $ARMIMAGE
-            RUN apk add --no-cache tzdata
+            RUN apt install tzdata
             ${PREFETCH_PROD}
             RUN addgroup -S node && adduser -S -G node node && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             USER node
