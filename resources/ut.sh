@@ -148,7 +148,7 @@ EOF
         FROM $IMAGE
         RUN apt install tzdata
         ${PREFETCH_PROD}
-        RUN addgroup -S node && adduser -S -G node node && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
+        RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
         USER node
         COPY --chown=node:node --from=${UT_PROJECT}:$TAG /app /app
         WORKDIR /app
@@ -162,7 +162,7 @@ EOF
             FROM $ARMIMAGE
             RUN apt install tzdata
             ${PREFETCH_PROD}
-            RUN addgroup -S node && adduser -S -G node node && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
+            RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             USER node
             COPY --chown=node:node --from=${UT_PROJECT}:$TAG /app /app
             WORKDIR /app
