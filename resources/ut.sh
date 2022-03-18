@@ -82,7 +82,7 @@ COPY --chown=node:node package.json package.json
 RUN npm --production=false --legacy-peer-deps install
 COPY --chown=node:node . .
 EOF
-docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls > .lint/npm-ls.txt" || true
+docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls -a > .lint/npm-ls.txt" || true
 docker run -u node:node -i --rm \
     -v ~/.ssh:/home/node/.ssh:ro \
     -v ~/.npmrc:/home/node/.npmrc:ro \
