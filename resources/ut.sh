@@ -61,9 +61,10 @@ done
 
 if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut)-docker.*$ ]]; then
     RUNAPK=$(cat <<END
+USER root
 RUN set -xe\
  && apk add --no-cache bash git openssh python make g++\
- && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v\
+ && git --version && bash --version && ssh -V && npm -v && node -v \
  && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
 WORKDIR /app
 RUN chown -R node:node /app
