@@ -1,7 +1,7 @@
 #!/bin/bash
 set -x
 set -e
-UT_PROJECT=`git config --get remote.origin.url | sed -n -r 's/.*\/(ut-.*|impl-.*|.*-ut).git/\1/p'`
+UT_PROJECT=`git config --get remote.origin.url | sed -n -r 's/.*\/(wave-.*|ut-.*|impl-.*|.*-ut).git/\1/p'`
 RELEASE=
 PREFETCH=
 PREFETCH_PROD=
@@ -19,6 +19,10 @@ if [[ ${UT_PROJECT} =~ impl-(.*) ]]; then
     UT_MODULE=${UT_IMPL}
     UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
 fi
+if [[ ${UT_PROJECT} =~ wave-(.*) ]]; then
+    UT_MODULE=${BASH_REMATCH[1]}
+    UT_PREFIX=wave_${BASH_REMATCH[1]//[-\/\\]/_}_jenkins
+fi
 if [[ ${UT_PROJECT} =~ ut-(.*) ]]; then
     UT_MODULE=${BASH_REMATCH[1]}
     UT_PREFIX=ut_${BASH_REMATCH[1]//[-\/\\]/_}_jenkins
@@ -29,7 +33,7 @@ GIT_BRANCH=origin/${GIT_BRANCH#origin/}
 BRANCH_NAME=${GIT_BRANCH}
 # replace / \ %2f %2F with -
 TAP_TIMEOUT=1000
-TEST_IMAGE_TAG=test-${EXECUTOR_NUMBER}
+TEST_IMAGE_TAG=test${EXECUTOR_NUMBER}
 if [[ $RELEASE && "${CHANGE_ID}" = "" ]]; then
     git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
 fi
@@ -81,6 +85,9 @@ ${LERNA}
 ${PREFETCH}
 COPY --chown=node:node package.json package.json
 RUN npm --production=false install
+RUN sed -i '/require/ s#^#//#' node_modules/ut-tools/bin/ut-lint.js
+RUN sed -i '/require/ s#^#//#' node_modules/ut-tools/bin/ut-cover.js
+RUN sed -i '/require/ s#^#//#' node_modules/ut-tools/bin/ut-precover.js
 COPY --chown=node:node . .
 EOF
 docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls > .lint/npm-ls.txt" || true

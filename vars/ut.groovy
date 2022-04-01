@@ -31,6 +31,7 @@ def call(Map params = [:]) {
                         currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.GIT_BRANCH
                     }
                     ansiColor('xterm') {
+                        sh "printenv|sort"
                         sh(libraryResource('ut.sh'))
                     }
                 }
