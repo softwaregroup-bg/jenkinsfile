@@ -29,6 +29,7 @@ GIT_BRANCH=origin/${GIT_BRANCH#origin/}
 BRANCH_NAME=${GIT_BRANCH}
 # replace / \ %2f %2F with -
 TAP_TIMEOUT=1000
+IMAGE_TAG=${TAG}-${EXECUTOR_NUMBER}
 TEST_IMAGE_TAG=test-${EXECUTOR_NUMBER}
 if [[ $RELEASE && "${CHANGE_ID}" = "" ]]; then
     git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
@@ -140,17 +141,17 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.c
 if [[ $RELEASE && ${UT_IMPL} ]]; then
     TAG=${RELEASE//[\/\\]/-}
     if [ "$TAG" = "master" ]; then TAG="latest"; fi
-    docker build -t ${UT_PROJECT}:$TAG . -f-<<EOF
+    docker build -t ${UT_PROJECT}:${IMAGE_TAG} . -f-<<EOF
         FROM ${UT_PROJECT}:${TEST_IMAGE_TAG}
         RUN npm prune --production
 EOF
-    docker build -t ${UT_PROJECT}-amd64 . -f-<<EOF
+    docker build -t ${UT_PROJECT}-${IMAGE_TAG}-amd64 . -f-<<EOF
         FROM $IMAGE
         RUN apt install tzdata
         ${PREFETCH_PROD}
         RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
         USER node
-        COPY --chown=node:node --from=${UT_PROJECT}:$TAG /app /app
+        COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
         WORKDIR /app
         COPY --chown=node:node dist dist
         ENTRYPOINT ["node", "index.js"]
@@ -158,30 +159,30 @@ EOF
 EOF
     echo "$DOCKER_PSW" | docker login -u "$DOCKER_USR" --password-stdin nexus-dev.softwaregroup.com:5001
     if [ "${ARMIMAGE}" ]; then
-        docker build -t ${UT_PROJECT}-arm64 . -f-<<EOF
+        docker build -t ${UT_PROJECT}-${IMAGE_TAG}-arm64 . -f-<<EOF
             FROM $ARMIMAGE
             RUN apt install tzdata
             ${PREFETCH_PROD}
             RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             USER node
-            COPY --chown=node:node --from=${UT_PROJECT}:$TAG /app /app
+            COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
             WORKDIR /app
             COPY --chown=node:node dist dist
             ENTRYPOINT ["node", "index.js"]
             CMD ["server"]
 EOF
-        docker tag ${UT_PROJECT}-amd64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG
-        docker tag ${UT_PROJECT}-arm64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG
+        docker tag ${UT_PROJECT}-${IMAGE_TAG}-amd64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG
+        docker tag ${UT_PROJECT}-${IMAGE_TAG}-arm64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG
         docker push nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG
         docker push nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG
-        docker rmi ${UT_PROJECT}:$TAG ${UT_PROJECT}-amd64 ${UT_PROJECT}-arm64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG
+        docker rmi ${UT_PROJECT}:${IMAGE_TAG} ${UT_PROJECT}-${IMAGE_TAG}-amd64 ${UT_PROJECT}-${IMAGE_TAG}-arm64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG
         # DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG
         # DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG --os linux --arch arm64 --variant v8
         # DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
     else
-        docker tag ${UT_PROJECT}-amd64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
+        docker tag ${UT_PROJECT}-${IMAGE_TAG}-amd64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
         docker push nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
-        docker rmi ${UT_PROJECT}:$TAG ${UT_PROJECT}-amd64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
+        docker rmi ${UT_PROJECT}:${IMAGE_TAG} ${UT_PROJECT}-${IMAGE_TAG}-amd64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
     fi
 fi
 
