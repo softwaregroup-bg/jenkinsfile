@@ -123,7 +123,7 @@ docker run -u node:node -i --rm \
     ${UT_PROJECT}:${TEST_IMAGE_TAG} -c "(git checkout -- .dockerignore || true) && npm run jenkins"
 docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.com:5000/softwaregroup/sonar-scanner:3.2.0-alpine \
   -c "sonar-scanner \
-  -Dsonar.host.url=https://sonar.softwaregroup.com/ \
+  -Dsonar.host.url=https://192.168.133.195/ \
   -Dsonar.projectKey=${UT_PROJECT} \
   -Dsonar.projectName=${UT_PROJECT} \
   -Dsonar.projectVersion=1 \
@@ -185,4 +185,4 @@ docker run -u node:node -i --rm \
     --cap-add=SYS_ADMIN \
     -v "$(pwd)/.lint:/app/.lint" \
     nexus-dev.softwaregroup.com:5000/softwaregroup/capture-website --output=.lint/sonar.png --width=1067 --height=858 --scale-factor=0.6 \
-    https://sonar.softwaregroup.com/dashboard?id=${UT_PROJECT}%3A${GIT_BRANCH//[\/\\]/%2F}
+    https://https://192.168.133.195/dashboard?id=${UT_PROJECT}%3A${GIT_BRANCH//[\/\\]/%2F}
