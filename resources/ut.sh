@@ -134,7 +134,7 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.c
   -Dsonar.tests=. \
   -Dsonar.test.inclusions=test/**/*.js,**/*.test.js,**/*.test.ts,**/*.test.tsx \
   -Dsonar.test.exclusions=node_modules/**/*,coverage/**/* \
-  -Dsonar.branch=${GIT_BRANCH} \
+  -Dsonar.branch.name=${GIT_BRANCH} \
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
   && chown -R $(id -u):$(id -g) /app/.scannerwork"
 if [[ $RELEASE && ${UT_IMPL} ]]; then
