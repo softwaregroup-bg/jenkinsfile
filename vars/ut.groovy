@@ -2,7 +2,7 @@ def call(Map params = [:]) {
     def buildImage = params.buildImage?:'nexus-dev.softwaregroup.com:5000/softwaregroup/ut-docker'
     def image = params.image?:'nexus-dev.softwaregroup.com:5000/softwaregroup/alpine-node:slim-14.15.3'
     def armimage = params.armimage?:''
-    def scanner = [dashboardUrl:'https://192.168.133.195']
+    def scanner = [dashboardUrl:'http://192.168.133.195']
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
     def repoUrl
     pipeline {
@@ -45,7 +45,7 @@ def call(Map params = [:]) {
                             }
                             files = findFiles(glob:'.scannerwork/report-task.txt')
                             if (files) {
-                                scanner = readProperties file: files[0].path, defaults: [dashboardUrl:'https://https://192.168.133.195']
+                                scanner = readProperties file: files[0].path, defaults: [dashboardUrl:'http://https://192.168.133.195']
                             }
                         }
                         recordIssues enabledForFailure: true, ignoreFailedBuilds: false, tools: [checkStyle(pattern: '.lint/lint*.xml')]
