@@ -29,7 +29,6 @@ GIT_BRANCH=origin/${GIT_BRANCH#origin/}
 BRANCH_NAME=${GIT_BRANCH}
 # replace / \ %2f %2F with -
 TAP_TIMEOUT=1000
-IMAGE_TAG=${TAG}-${EXECUTOR_NUMBER}
 TEST_IMAGE_TAG=test-${EXECUTOR_NUMBER}
 if [[ $RELEASE && "${CHANGE_ID}" = "" ]]; then
     git checkout -B ${GIT_BRANCH#origin/} --track remotes/${GIT_BRANCH}
@@ -142,6 +141,7 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.c
 if [[ $RELEASE && ${UT_IMPL} ]]; then
     TAG=${RELEASE//[\/\\]/-}
     if [ "$TAG" = "master" ]; then TAG="latest"; fi
+    IMAGE_TAG=${TAG}-${EXECUTOR_NUMBER}
     docker build -t ${UT_PROJECT}:${IMAGE_TAG} . -f-<<EOF
         FROM ${UT_PROJECT}:${TEST_IMAGE_TAG}
         RUN npm prune --production
