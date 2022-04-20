@@ -122,7 +122,7 @@ docker run -u node:node -i --rm \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     --entrypoint=/bin/bash \
     ${UT_PROJECT}:${TEST_IMAGE_TAG} -c "(git checkout -- .dockerignore || true) && npm run jenkins"
-docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.com:5000/softwaregroup/sonar-scanner:3.2.0-alpine \
+docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.com:5000/softwaregroup/sonar-scanner:4.7.0 \
   -c "sonar-scanner \
   -Dsonar.host.url=http://192.168.133.195/ \
   -Dsonar.projectKey=${UT_PROJECT} \
