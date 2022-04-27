@@ -186,4 +186,4 @@ docker run -u node:node -i --rm \
     --cap-add=SYS_ADMIN \
     -v "$(pwd)/.lint:/app/.lint" \
     nexus-dev.softwaregroup.com:5000/softwaregroup/capture-website --output=.lint/sonar.png --width=1067 --height=858 --scale-factor=0.6 \
-    http://http://192.168.133.195/dashboard?id=${UT_PROJECT}%3A${GIT_BRANCH//[\/\\]/%2F}
+    http://192.168.133.195/dashboard?id=${UT_PROJECT}%3A${GIT_BRANCH//[\/\\]/%2F}
