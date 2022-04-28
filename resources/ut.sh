@@ -146,9 +146,10 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
 EOF
     docker build -t ${UT_PROJECT}-amd64 . -f-<<EOF
         FROM $IMAGE
+        USER root
+        RUN addgroup -S node && adduser -S -G node node && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
         RUN apk add --no-cache tzdata
         ${PREFETCH_PROD}
-        RUN addgroup -S node && adduser -S -G node node && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
         USER node
         COPY --chown=node:node --from=${UT_PROJECT}:$TAG /app /app
         WORKDIR /app
@@ -160,9 +161,10 @@ EOF
     if [ "${ARMIMAGE}" ]; then
         docker build -t ${UT_PROJECT}-arm64 . -f-<<EOF
             FROM $ARMIMAGE
+            USER root
+            RUN addgroup -S node && adduser -S -G node node && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             RUN apk add --no-cache tzdata
             ${PREFETCH_PROD}
-            RUN addgroup -S node && adduser -S -G node node && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             USER node
             COPY --chown=node:node --from=${UT_PROJECT}:$TAG /app /app
             WORKDIR /app
