@@ -153,6 +153,7 @@ EOF
         RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
         USER node
         COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
+        COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /home/node/.cache/ms-playwright /home/node/.cache/ms-playwright
         WORKDIR /app
         COPY --chown=node:node dist dist
         ENTRYPOINT ["node", "index.js"]
