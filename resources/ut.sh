@@ -144,7 +144,7 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
     IMAGE_TAG=${TAG}-${EXECUTOR_NUMBER}
     docker build -t ${UT_PROJECT}:${IMAGE_TAG} . -f-<<EOF
         FROM ${UT_PROJECT}:${TEST_IMAGE_TAG}
-        RUN npm prune --production
+        RUN npm prune --legacy-peer-deps --production
 EOF
     docker build -t ${UT_PROJECT}-${IMAGE_TAG}-amd64 . -f-<<EOF
         FROM $IMAGE
