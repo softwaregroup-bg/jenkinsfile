@@ -75,7 +75,7 @@ def call(Map params = [:]) {
                             reportName: 'Documentation',
                             reportTitles: 'API',
                             reportDir: '.lint/doc',
-                            reportFiles: 'api/server/index.html',
+                            reportFiles: 'aa/api/server/index.html',
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
                             keepAll: true
