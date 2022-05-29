@@ -50,7 +50,7 @@ if [ -f "lerna.json" ]; then
 fi
 
 # Create prerequisite folders
-for item in coverage .lint
+for item in coverage .lint dist help
 do
     if [ -d $item ]
     then
@@ -89,6 +89,8 @@ docker run -u node:node -i --rm \
     -v ~/.gitconfig:/home/node/.gitconfig:ro \
     -v "$(pwd)/.git:/app/.git" \
     -v "$(pwd)/.lint:/app/.lint" \
+    -v "$(pwd)/dist:/app/dist" \
+    -v "$(pwd)/help:/app/help" \
     -v "$(pwd)/coverage:/app/coverage" \
     -e JOB_TYPE=$JOB_TYPE \
     -e JOB_NAME=${UT_PROJECT} \
@@ -154,6 +156,8 @@ EOF
         COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
         COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /home/node/.cache/ms-playwright /home/node/.cache/ms-playwright
         WORKDIR /app
+        COPY --chown=node:node dist dist
+        COPY --chown=node:node help help
         ENTRYPOINT ["node", "index.js"]
         CMD ["server"]
 EOF
@@ -167,6 +171,8 @@ EOF
             USER node
             COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
             WORKDIR /app
+            COPY --chown=node:node dist dist
+            COPY --chown=node:node help help
             ENTRYPOINT ["node", "index.js"]
             CMD ["server"]
 EOF
