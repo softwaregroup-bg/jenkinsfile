@@ -121,7 +121,8 @@ docker run -u node:node -i \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     --entrypoint=/bin/bash \
-    ${UT_PROJECT}:${TEST_IMAGE_TAG} --name ${UT_PROJECT}-${TEST_IMAGE_TAG} -c "(git checkout -- .dockerignore || true) && npm run jenkins" \
+    --name ${UT_PROJECT}-${TEST_IMAGE_TAG} \
+    ${UT_PROJECT}:${TEST_IMAGE_TAG} -c "(git checkout -- .dockerignore || true) && npm run jenkins" \
     || (docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG} && false)
 docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app/package.json package.json
 docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG}
