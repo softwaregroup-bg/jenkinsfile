@@ -79,11 +79,11 @@ ${NPMRC}
 ${LERNA}
 ${PREFETCH}
 COPY --chown=node:node package.json package.json
-RUN npm --production=false --legacy-peer-deps install
+# RUN npm --production=false --legacy-peer-deps install
 COPY --chown=node:node . .
 EOF
 docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls -a > .lint/npm-ls.txt" || true
-docker run -u node:node -i --rm \
+docker run -u node:node -i \
     -v ~/.ssh:/home/node/.ssh:ro \
     -v ~/.npmrc:/home/node/.npmrc:ro \
     -v ~/.gitconfig:/home/node/.gitconfig:ro \
@@ -121,7 +121,10 @@ docker run -u node:node -i --rm \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     --entrypoint=/bin/bash \
-    ${UT_PROJECT}:${TEST_IMAGE_TAG} -c "(git checkout -- .dockerignore || true) && npm run jenkins"
+    ${UT_PROJECT}:${TEST_IMAGE_TAG} --name ${UT_PROJECT}-${TEST_IMAGE_TAG} -c "(git checkout -- .dockerignore || true) && npm run jenkins" \
+    || (docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG} && false)
+docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app/package.json package.json
+docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG}
 docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.com:5000/softwaregroup/sonar-scanner:3.2.0-alpine \
   -c "sonar-scanner \
   -Dsonar.host.url=https://sonar.softwaregroup.com/ \
@@ -158,6 +161,7 @@ EOF
         WORKDIR /app
         COPY --chown=node:node dist dist
         COPY --chown=node:node help help
+        COPY --chown=node:node package.json package.json
         ENTRYPOINT ["node", "index.js"]
         CMD ["server"]
 EOF
@@ -173,6 +177,7 @@ EOF
             WORKDIR /app
             COPY --chown=node:node dist dist
             COPY --chown=node:node help help
+            COPY --chown=node:node package.json package.json
             ENTRYPOINT ["node", "index.js"]
             CMD ["server"]
 EOF
@@ -188,6 +193,13 @@ EOF
         docker tag ${UT_PROJECT}-${IMAGE_TAG}-amd64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
         docker push nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
         docker rmi ${UT_PROJECT}:${IMAGE_TAG} ${UT_PROJECT}-${IMAGE_TAG}-amd64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
+    fi
+    if [ "${DEPLOY_TOKEN}" ]; then
+        docker run -u node:node -i --rm \
+            -v "$(pwd)/package.json:/app/package.json" \
+            -e DEPLOY_TOKEN=$DEPLOY_TOKEN \
+            -e DEPLOY_TAG=$TAG \
+            ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm run deploy" || true
     fi
 fi
 
