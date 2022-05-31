@@ -125,6 +125,12 @@ docker run -u node:node -i \
     || (docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG} && false)
 docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app/package.json package.json
 docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG}
+
+SONAR_BRANCH=-Dsonar.branch.name=${GIT_BRANCH#origin/}
+if [[ ${CHANGE_ID} ]]; then
+    SONAR_BRANCH="-Dsonar.pullrequest.key=${CHANGE_ID} -Dsonar.pullrequest.branch=${CHANGE_BRANCH#origin/} -Dsonar.pullrequest.base=${CHANGE_TARGET#origin/}"
+fi
+
 docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.com:5000/softwaregroup/sonar-scanner:3.2.0-alpine \
   -c "sonar-scanner \
   -Dsonar.host.url=https://sca.softwaregroup.com/ \
@@ -139,7 +145,7 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.c
   -Dsonar.test.inclusions=test/**/*.js,**/*.test.js,**/*.test.ts,**/*.test.tsx \
   -Dsonar.test.exclusions=node_modules/**/*,coverage/**/*,dist/**/* \
   -Dsonar.coverage.exclusions=ui/**/* \
-  -Dsonar.branch.name=${GIT_BRANCH#origin/} \
+  ${SONAR_BRANCH} \
   -Dsonar.login=${SONAR_SCA_USR} \
   -Dsonar.password=${SONAR_SCA_PSW} \
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
