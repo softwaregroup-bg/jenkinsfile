@@ -49,8 +49,8 @@ if [ -f "lerna.json" ]; then
     LERNA=$'COPY --chown=node:node lerna.json lerna.json\nCOPY --chown=node:node packages packages/'
 fi
 
-if [ -f ".lint/.scannerwork" ]; then
-    chown -R $(id -u):$(id -g) .lint/.scannerwork
+if [ -f ".lint/.sonarwork" ]; then
+    chown -R $(id -u):$(id -g) .lint/.sonarwork
 fi
 
 # Create prerequisite folders
