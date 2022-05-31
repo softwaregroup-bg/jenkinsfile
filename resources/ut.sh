@@ -50,7 +50,7 @@ if [ -f "lerna.json" ]; then
 fi
 
 # Create prerequisite folders
-for item in coverage .lint dist help
+for item in coverage .lint dist
 do
     if [ -d $item ]
     then
@@ -90,7 +90,6 @@ docker run -u node:node -i \
     -v "$(pwd)/.git:/app/.git" \
     -v "$(pwd)/.lint:/app/.lint" \
     -v "$(pwd)/dist:/app/dist" \
-    -v "$(pwd)/help:/app/help" \
     -v "$(pwd)/coverage:/app/coverage" \
     -e JOB_TYPE=$JOB_TYPE \
     -e JOB_NAME=${UT_PROJECT} \
@@ -135,10 +134,10 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.c
   -Dsonar.projectBaseDir=/app \
   -Dsonar.sources=. \
   -Dsonar.inclusions=**/*.js,**/*.ts,**/*.tsx \
-  -Dsonar.exclusions=node_modules/**/*,coverage/**/*,test/**/*,tap-snapshots/**/*,dist/**/*,help/**/* \
+  -Dsonar.exclusions=node_modules/**/*,coverage/**/*,test/**/*,tap-snapshots/**/*,dist/**/* \
   -Dsonar.tests=. \
   -Dsonar.test.inclusions=test/**/*.js,**/*.test.js,**/*.test.ts,**/*.test.tsx \
-  -Dsonar.test.exclusions=node_modules/**/*,coverage/**/*,dist/**/*,help/**/* \
+  -Dsonar.test.exclusions=node_modules/**/*,coverage/**/*,dist/**/* \
   -Dsonar.coverage.exclusions=ui/**/* \
   -Dsonar.branch=${GIT_BRANCH} \
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
@@ -161,7 +160,6 @@ EOF
         COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /home/node/.cache/ms-playwright /home/node/.cache/ms-playwright
         WORKDIR /app
         COPY --chown=node:node dist dist
-        COPY --chown=node:node help help
         COPY --chown=node:node package.json package.json
         ENTRYPOINT ["node", "index.js"]
         CMD ["server"]
@@ -177,7 +175,6 @@ EOF
             COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
             WORKDIR /app
             COPY --chown=node:node dist dist
-            COPY --chown=node:node help help
             COPY --chown=node:node package.json package.json
             ENTRYPOINT ["node", "index.js"]
             CMD ["server"]
