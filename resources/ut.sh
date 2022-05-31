@@ -143,6 +143,7 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.c
   -Dsonar.login=${SONAR_SCA_USR} \
   -Dsonar.password=${SONAR_SCA_PSW} \
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+  -Dsonar.working.directory=.lint/.sonarwork
   && chown -R $(id -u):$(id -g) /app/.scannerwork"
 if [[ $RELEASE && ${UT_IMPL} ]]; then
     TAG=${RELEASE//[\/\\]/-}
