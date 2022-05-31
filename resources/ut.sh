@@ -49,7 +49,9 @@ if [ -f "lerna.json" ]; then
     LERNA=$'COPY --chown=node:node lerna.json lerna.json\nCOPY --chown=node:node packages packages/'
 fi
 
-chown -R $(id -u):$(id -g) .lint/.scannerwork
+if [ -f ".lint/.scannerwork" ]; then
+    chown -R $(id -u):$(id -g) .lint/.scannerwork
+fi
 
 # Create prerequisite folders
 for item in coverage .lint dist
