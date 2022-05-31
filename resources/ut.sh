@@ -128,7 +128,7 @@ docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG}
 
 SONAR_BRANCH=-Dsonar.branch.name=${GIT_BRANCH#origin/}
 if [[ ${CHANGE_ID} ]]; then
-    SONAR_BRANCH=-Dsonar.pullrequest.key=${CHANGE_ID} -Dsonar.pullrequest.branch=${CHANGE_BRANCH#origin/} -Dsonar.pullrequest.base=${CHANGE_TARGET#origin/}
+    SONAR_BRANCH="-Dsonar.pullrequest.key=${CHANGE_ID} -Dsonar.pullrequest.branch=${CHANGE_BRANCH#origin/} -Dsonar.pullrequest.base=${CHANGE_TARGET#origin/}"
 fi
 
 docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.com:5000/softwaregroup/sonar-scanner:3.2.0-alpine \
