@@ -59,7 +59,7 @@ do
     mkdir $item
 done
 
-if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut)-(docker|gallium).*$ ]]; then
+if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut|node)-(docker|gallium).*$ ]]; then
     RUNAPK=$(cat <<END
 RUN set -xe\
  && apt install git openssh-client python3 make g++ tzdata \
