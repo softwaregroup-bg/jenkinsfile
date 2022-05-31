@@ -20,6 +20,7 @@ def call(Map params = [:]) {
                     GITLAB_STATUS_TOKEN = credentials('GITLAB_STATUS_TOKEN')
                     encryptionPass = credentials('UT_DB_ENCRYPTION_PASS')
                     DOCKER = credentials('dockerPublisher')
+                    SONAR_SCA = credentials('SONAR_SCA')
                     BUILD_IMAGE = "${buildImage}"
                     IMAGE = "${image}"
                     ARMIMAGE = "${armimage}"

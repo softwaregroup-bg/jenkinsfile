@@ -59,7 +59,7 @@ do
     mkdir $item
 done
 
-if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut)-(docker|gallium).*$ ]]; then
+if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut|node)-(docker|gallium).*$ ]]; then
     RUNAPK=$(cat <<END
 RUN set -xe\
  && apt install git openssh-client python3 make g++ tzdata \
@@ -127,7 +127,7 @@ docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app/package.json package.json
 docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG}
 docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.com:5000/softwaregroup/sonar-scanner:3.2.0-alpine \
   -c "sonar-scanner \
-  -Dsonar.host.url=https://sonar.softwaregroup.com/ \
+  -Dsonar.host.url=https://sca.softwaregroup.com/ \
   -Dsonar.projectKey=${UT_PROJECT} \
   -Dsonar.projectName=${UT_PROJECT} \
   -Dsonar.projectVersion=1 \
@@ -139,9 +139,12 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.c
   -Dsonar.test.inclusions=test/**/*.js,**/*.test.js,**/*.test.ts,**/*.test.tsx \
   -Dsonar.test.exclusions=node_modules/**/*,coverage/**/*,dist/**/* \
   -Dsonar.coverage.exclusions=ui/**/* \
-  -Dsonar.branch=${GIT_BRANCH} \
+  -Dsonar.branch.name=${GIT_BRANCH#origin/} \
+  -Dsonar.login=${SONAR_SCA_USR} \
+  -Dsonar.password=${SONAR_SCA_PSW} \
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-  && chown -R $(id -u):$(id -g) /app/.scannerwork"
+  -Dsonar.working.directory=.lint/.scannerwork \
+  && chown -R $(id -u):$(id -g) /app/.lint/.scannerwork"
 if [[ $RELEASE && ${UT_IMPL} ]]; then
     TAG=${RELEASE//[\/\\]/-}
     if [ "$TAG" = "master" ]; then TAG="latest"; fi
