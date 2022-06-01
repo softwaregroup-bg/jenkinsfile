@@ -212,7 +212,8 @@ fi
 
 docker rmi ${UT_PROJECT}:${TEST_IMAGE_TAG}
 
-SONAR_QUERY="&branch=${GIT_BRANCH//[\/\\]/%2F}"
+SONAR_QUERY=${GIT_BRANCH#origin/}
+SONAR_QUERY="&branch=${SONAR_QUERY//[\/\\]/%2F}"
 if [[ ${CHANGE_ID} ]]; then
     SONAR_QUERY="&pullRequest=${CHANGE_ID}"
 fi
