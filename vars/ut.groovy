@@ -2,7 +2,7 @@ def call(Map params = [:]) {
     def buildImage = params.buildImage?:'nexus-dev.softwaregroup.com:5000/softwaregroup/ut-gallium'
     def image = params.image?:'nexus-dev.softwaregroup.com:5000/softwaregroup/deploy-gallium'
     def armimage = params.armimage?:''
-    def scanner = [dashboardUrl:'https://sonar.softwaregroup.com']
+    def scanner = [dashboardUrl:'https://sca.softwaregroup.com']
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
     def repoUrl
     pipeline {
@@ -46,9 +46,9 @@ def call(Map params = [:]) {
                                 pkg = readJSON file: files[0].path
                                 currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.GIT_BRANCH + ' : ' + pkg.version
                             }
-                            files = findFiles(glob:'.scannerwork/report-task.txt')
+                            files = findFiles(glob:'.lint/.scannerwork/report-task.txt')
                             if (files) {
-                                scanner = readProperties file: files[0].path, defaults: [dashboardUrl:'https://sonar.softwaregroup.com']
+                                scanner = readProperties file: files[0].path, defaults: [dashboardUrl:'https://sca.softwaregroup.com']
                             }
                         }
                         recordIssues enabledForFailure: true, ignoreFailedBuilds: false, tools: [checkStyle(pattern: '.lint/lint*.xml')]
