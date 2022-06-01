@@ -9,17 +9,20 @@ NPMRC=
 RUNAPK=
 UT_IMPL=
 UT_MODULE=
+SONAR_PREFIX=
 LERNA=
 DBSUFFIX=
 if [[ ${CHANGE_ID} ]]; then
     DBSUFFIX=-${CHANGE_ID}
 fi
 if [[ ${UT_PROJECT} =~ impl-(.*) ]]; then
+    SONAR_PREFIX=ut5/
     UT_IMPL=${BASH_REMATCH[1]}
     UT_MODULE=${UT_IMPL}
     UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
 fi
 if [[ ${UT_PROJECT} =~ ut-(.*) ]]; then
+    SONAR_PREFIX=ut5impl/
     UT_MODULE=${BASH_REMATCH[1]}
     UT_PREFIX=ut_${BASH_REMATCH[1]//[-\/\\]/_}_jenkins
 fi
@@ -134,7 +137,7 @@ fi
 docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.com:5000/softwaregroup/sonar-scanner:3.2.0-alpine \
   -c "sonar-scanner \
   -Dsonar.host.url=https://sca.softwaregroup.com/ \
-  -Dsonar.projectKey=${UT_PROJECT} \
+  -Dsonar.projectKey=${SONAR_PREFIX}${UT_PROJECT} \
   -Dsonar.projectName=${UT_PROJECT} \
   -Dsonar.projectVersion=1 \
   -Dsonar.projectBaseDir=/app \
