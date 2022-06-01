@@ -16,13 +16,13 @@ if [[ ${CHANGE_ID} ]]; then
     DBSUFFIX=-${CHANGE_ID}
 fi
 if [[ ${UT_PROJECT} =~ impl-(.*) ]]; then
-    SONAR_PREFIX=ut5/
+    # SONAR_PREFIX=ut5/
     UT_IMPL=${BASH_REMATCH[1]}
     UT_MODULE=${UT_IMPL}
     UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
 fi
 if [[ ${UT_PROJECT} =~ ut-(.*) ]]; then
-    SONAR_PREFIX=ut5impl/
+    # SONAR_PREFIX=ut5impl/
     UT_MODULE=${BASH_REMATCH[1]}
     UT_PREFIX=ut_${BASH_REMATCH[1]//[-\/\\]/_}_jenkins
 fi
@@ -228,4 +228,4 @@ docker run -u node:node -i --rm \
     --cap-add=SYS_ADMIN \
     -v "$(pwd)/.lint:/app/.lint" \
     nexus-dev.softwaregroup.com:5000/softwaregroup/capture-website --output=.lint/sonar.png --width=1067 --height=858 --scale-factor=0.6 \
-    https://sca.softwaregroup.com/dashboard?id=${UT_PROJECT}${SONAR_QUERY}
+    https://sca.softwaregroup.com/dashboard?id=${SONAR_PREFIX}${UT_PROJECT}${SONAR_QUERY}
