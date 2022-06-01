@@ -31,7 +31,7 @@ def call(Map params = [:]) {
                         pkgjson = readJSON file: 'package.json'
                         repoUrl = pkgjson.repository.url
                         currentBuild.displayName = '#' + currentBuild.number + ' - ' + env.GIT_BRANCH
-                        env.REPO_URL = repoUrl.replaceAll(/^git@|.git$/, '').replace(':', '/') + '''/tree/''' + env.GIT_BRANCH
+                        env.REPO_URL = 'https://' + repoUrl.replaceAll(/^git@|.git$/, '').replace(':', '/') + '''/tree/''' + (env.CHANGE_ID ? env.CHANGE_BRANCH : env.GIT_BRANCH)
                     }
                     ansiColor('xterm') {
                         sh(libraryResource('ut.sh'))
@@ -110,7 +110,7 @@ def call(Map params = [:]) {
 </div>
 <b>Trigger</b>:  ${CAUSE}<br>
 <b>Job</b>: ${JOB_URL}<br>
-<b>Branch</b>: ''' + repoUrl.replaceAll(/^git@|.git$/, '').replace(':', '/') + '''/tree/''' + env.GIT_BRANCH + '''<br>
+<b>Branch</b>: ''' + repoUrl.replaceAll(/^git@|.git$/, '').replace(':', '/') + '''/tree/''' + (env.CHANGE_ID ? env.CHANGE_BRANCH : env.GIT_BRANCH) + '''<br>
 <b>MR/PR</b>: ${CHANGE_URL}<br>
 <b>Summary</b>: ${BUILD_URL}<br>
 <b>Console</b>: ${BUILD_URL}console<br>
