@@ -212,9 +212,14 @@ fi
 
 docker rmi ${UT_PROJECT}:${TEST_IMAGE_TAG}
 
+SONAR_QUERY="&branch=${GIT_BRANCH//[\/\\]/%2F}"
+if [[ ${CHANGE_ID} ]]; then
+    SONAR_QUERY="&pullRequest=${CHANGE_ID}"
+fi
+
 sleep 30
 docker run -u node:node -i --rm \
     --cap-add=SYS_ADMIN \
     -v "$(pwd)/.lint:/app/.lint" \
     nexus-dev.softwaregroup.com:5000/softwaregroup/capture-website --output=.lint/sonar.png --width=1067 --height=858 --scale-factor=0.6 \
-    https://sonar.softwaregroup.com/dashboard?id=${UT_PROJECT}%3A${GIT_BRANCH//[\/\\]/%2F}
+    https://sonar.softwaregroup.com/dashboard?id=${UT_PROJECT}${SONAR_QUERY}
