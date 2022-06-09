@@ -62,8 +62,8 @@ done
 if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut)-docker.*$ ]]; then
     RUNAPK=$(cat <<END
 RUN set -xe\
- && apk add --no-cache bash git openssh python make g++\
- && git --version && bash --version && ssh -V && npm -v && node -v && yarn -v\
+ && apt install git openssh-client python3 make g++ tzdata\
+ && git --version && bash --version && ssh -V && npm -v && node -v\
  && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
 WORKDIR /app
 RUN chown -R node:node /app
@@ -146,9 +146,10 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
 EOF
     docker build -t ${UT_PROJECT}-amd64 . -f-<<EOF
         FROM $IMAGE
-        RUN apk add --no-cache tzdata
+        RUN apt install tzdata
         ${PREFETCH_PROD}
         COPY --from=${UT_PROJECT}:$TAG /app /app
+        COPY --from=${UT_PROJECT}:$TAG /root/.cache/ms-playwright /root/.cache/ms-playwright
         WORKDIR /app
         COPY dist dist
         ENTRYPOINT ["node", "index.js"]
