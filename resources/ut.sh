@@ -149,7 +149,7 @@ EOF
         RUN apt install tzdata
         ${PREFETCH_PROD}
         COPY --from=${UT_PROJECT}:$TAG /app /app
-        COPY --from=${UT_PROJECT}:$TAG /root/.cache/ms-playwright /root/.cache/ms-playwright
+        COPY --chown=root:root --from=${UT_PROJECT}:$TAG /home/node/.cache/ms-playwright /root/.cache/ms-playwright
         WORKDIR /app
         COPY dist dist
         ENTRYPOINT ["node", "index.js"]
