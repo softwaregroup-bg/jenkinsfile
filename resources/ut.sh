@@ -101,7 +101,7 @@ docker run -u node:node -i \
     -v "$(pwd)/dist:/app/dist" \
     -v "$(pwd)/coverage:/app/coverage" \
     -v "node_modules_cache:/app/node_modules/.cache" \
-    -e TAP_JOBS=7 \
+    -e TAP_JOBS=3 \
     -e JOB_TYPE=$JOB_TYPE \
     -e JOB_NAME=${UT_PROJECT} \
     -e BUILD_ID=$BUILD_ID \
