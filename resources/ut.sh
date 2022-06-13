@@ -101,6 +101,7 @@ docker run -u node:node -i \
     -v "$(pwd)/dist:/app/dist" \
     -v "$(pwd)/coverage:/app/coverage" \
     -v "node_modules_cache:/app/node_modules/.cache" \
+    -e TAP_JOBS=7 \
     -e JOB_TYPE=$JOB_TYPE \
     -e JOB_NAME=${UT_PROJECT} \
     -e BUILD_ID=$BUILD_ID \
@@ -173,7 +174,6 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
 EOF
     docker build -t ${UT_PROJECT}-${IMAGE_TAG}-amd64 . -f-<<EOF
         FROM $IMAGE
-        RUN apt install tzdata
         ${PREFETCH_PROD}
         RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
         USER node
@@ -189,7 +189,6 @@ EOF
     if [ "${ARMIMAGE}" ]; then
         docker build -t ${UT_PROJECT}-${IMAGE_TAG}-arm64 . -f-<<EOF
             FROM $ARMIMAGE
-            RUN apt install tzdata
             ${PREFETCH_PROD}
             RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             USER node
