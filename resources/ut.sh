@@ -75,14 +75,17 @@ END
 )
 fi
 
+export DOCKER_BUILDKIT=1
+
 docker build -t ${UT_PROJECT}:${TEST_IMAGE_TAG} . -f-<<EOF
+# syntax=docker/dockerfile:experimental
 FROM $BUILD_IMAGE
 $RUNAPK
 ${NPMRC}
 ${LERNA}
 ${PREFETCH}
 COPY --chown=node:node package.json package.json
-RUN npm --production=false --legacy-peer-deps install
+RUN --mount=type=cache,target=/tmp/app/.npm,mode=0777,uid=1000,gid=1000 npm --production=false --legacy-peer-deps install
 COPY --chown=node:node . .
 EOF
 docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls -a > .lint/npm-ls.txt" || true
