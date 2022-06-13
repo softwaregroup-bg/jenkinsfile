@@ -98,7 +98,7 @@ docker run -u node:node -i \
     -v "$(pwd)/.lint:/app/.lint" \
     -v "$(pwd)/dist:/app/dist" \
     -v "$(pwd)/coverage:/app/coverage" \
-    -v "node_modules_cache:/app/node_modules/.cache" /
+    -v "node_modules_cache:/app/node_modules/.cache" \
     -e JOB_TYPE=$JOB_TYPE \
     -e JOB_NAME=${UT_PROJECT} \
     -e BUILD_ID=$BUILD_ID \
