@@ -89,7 +89,7 @@ ${LERNA}
 ${PREFETCH}
 USER root
 RUN --mount=type=cache,target=/tmp/app/.npm,mode=0777,uid=1000,gid=1000 \
-  npm update -g --legacy-peer-deps ut-tools ut-storybook ut-webpack ut-help
+  npm install --location=global --legacy-peer-deps ut-tools@latest ut-storybook@latest ut-webpack@latest ut-help@latest
 USER node
 COPY --chown=node:node package.json package.json
 RUN --mount=type=cache,target=/tmp/app/.npm,mode=0777,uid=1000,gid=1000 \
