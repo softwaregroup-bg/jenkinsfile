@@ -87,7 +87,6 @@ ${PREFETCH}
 COPY --chown=node:node package.json package.json
 RUN --mount=type=cache,target=/tmp/app/.npm,mode=0777,uid=1000,gid=1000 \
   mkdir -p /app/node_modules/.cache \
-  && npm config delete cache \
   && npm --production=false --legacy-peer-deps install
 COPY --chown=node:node . .
 EOF
