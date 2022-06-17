@@ -20,11 +20,14 @@ if [[ ${UT_PROJECT} =~ impl-(.*) ]]; then
     UT_IMPL=${BASH_REMATCH[1]}
     UT_MODULE=${UT_IMPL}
     UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
+    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/impl-gallium-global
 fi
 if [[ ${UT_PROJECT} =~ ut-(.*) ]]; then
     # SONAR_PREFIX=ut5impl/
     UT_MODULE=${BASH_REMATCH[1]}
     UT_PREFIX=ut_${BASH_REMATCH[1]//[-\/\\]/_}_jenkins
+    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/node-gallium-global
+    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/ut-gallium-global
 fi
 [[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]] || true && RELEASE=${BASH_REMATCH[0]}
 # add origin/ if missing
@@ -87,7 +90,8 @@ ${PREFETCH}
 COPY --chown=node:node package.json package.json
 RUN --mount=type=cache,target=/tmp/app/.npm,mode=0777,uid=1000,gid=1000 \
   mkdir -p /app/node_modules/.cache \
-  && npm --production=false --legacy-peer-deps install
+  && npm update -g ut-tools ut-storybook ut-webpack ut-help
+  && npm --legacy-peer-deps install
 COPY --chown=node:node . .
 EOF
 docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls -a > .lint/npm-ls.txt" || true
