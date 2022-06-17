@@ -90,6 +90,7 @@ ${PREFETCH}
 COPY --chown=node:node package.json package.json
 RUN --mount=type=cache,target=/home/node/.npm,mode=0777,uid=1000,gid=1000 \
   mkdir -p /app/node_modules/.cache \
+  && rm package-lock.json \
   && npm --legacy-peer-deps --registry https://nexus.softwaregroup.com/repository/npm-all/ install \
   && npm config delete cache
 COPY --chown=node:node . .
