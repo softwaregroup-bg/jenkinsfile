@@ -90,7 +90,8 @@ ${PREFETCH}
 COPY --chown=node:node package.json package.json
 RUN --mount=type=cache,target=/tmp/app/.npm,mode=0777,uid=1000,gid=1000 \
   mkdir -p /app/node_modules/.cache \
-  && npm --legacy-peer-deps install
+  && npm --legacy-peer-deps install \
+  && npm config delete cache
 COPY --chown=node:node . .
 EOF
 docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls -a > .lint/npm-ls.txt" || true
