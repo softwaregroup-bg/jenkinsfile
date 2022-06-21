@@ -20,14 +20,14 @@ if [[ ${UT_PROJECT} =~ impl-(.*) ]]; then
     UT_IMPL=${BASH_REMATCH[1]}
     UT_MODULE=${UT_IMPL}
     UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
-    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/impl-gallium-global
+    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/impl-gallium
 fi
 if [[ ${UT_PROJECT} =~ ut-(.*) ]]; then
     # SONAR_PREFIX=ut5impl/
     UT_MODULE=${BASH_REMATCH[1]}
     UT_PREFIX=ut_${BASH_REMATCH[1]//[-\/\\]/_}_jenkins
-    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/node-gallium-global
-    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/ut-gallium-global
+    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/node-gallium
+    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/ut-gallium
 fi
 [[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]] || true && RELEASE=${BASH_REMATCH[0]}
 # add origin/ if missing
@@ -88,6 +88,7 @@ ${NPMRC}
 ${LERNA}
 ${PREFETCH}
 COPY --chown=node:node package.json package.json
+# RUN --mount=type=cache,target=/home/node/.npm,mode=0777,uid=1000,gid=1000 \ # https://community.sonatype.com/t/cannot-install-with-registry-npm-group/6279
 RUN mkdir -p /app/node_modules/.cache \
   && npm --legacy-peer-deps install \
   && npm config delete cache
