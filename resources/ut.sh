@@ -20,11 +20,14 @@ if [[ ${UT_PROJECT} =~ impl-(.*) ]]; then
     UT_IMPL=${BASH_REMATCH[1]}
     UT_MODULE=${UT_IMPL}
     UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
+    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/impl-gallium
 fi
 if [[ ${UT_PROJECT} =~ ut-(.*) ]]; then
     # SONAR_PREFIX=ut5impl/
     UT_MODULE=${BASH_REMATCH[1]}
     UT_PREFIX=ut_${BASH_REMATCH[1]//[-\/\\]/_}_jenkins
+    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/node-gallium
+    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/ut-gallium
 fi
 [[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]] || true && RELEASE=${BASH_REMATCH[0]}
 # add origin/ if missing
@@ -75,14 +78,20 @@ END
 )
 fi
 
+export DOCKER_BUILDKIT=1
+
 docker build -t ${UT_PROJECT}:${TEST_IMAGE_TAG} . -f-<<EOF
+# syntax=docker/dockerfile:experimental
 FROM $BUILD_IMAGE
 $RUNAPK
 ${NPMRC}
 ${LERNA}
 ${PREFETCH}
 COPY --chown=node:node package.json package.json
-RUN npm --production=false --legacy-peer-deps install
+# RUN --mount=type=cache,target=/home/node/.npm,mode=0777,uid=1000,gid=1000 \ # https://community.sonatype.com/t/cannot-install-with-registry-npm-group/6279
+RUN mkdir -p /app/node_modules/.cache \
+  && npm --legacy-peer-deps install \
+  && npm config delete cache
 COPY --chown=node:node . .
 EOF
 docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls -a > .lint/npm-ls.txt" || true
@@ -94,6 +103,8 @@ docker run -u node:node -i \
     -v "$(pwd)/.lint:/app/.lint" \
     -v "$(pwd)/dist:/app/dist" \
     -v "$(pwd)/coverage:/app/coverage" \
+    -v "node_modules_cache:/app/node_modules/.cache" \
+    -e TAP_JOBS=4 \
     -e JOB_TYPE=$JOB_TYPE \
     -e JOB_NAME=${UT_PROJECT} \
     -e BUILD_ID=$BUILD_ID \
@@ -166,7 +177,6 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
 EOF
     docker build -t ${UT_PROJECT}-${IMAGE_TAG}-amd64 . -f-<<EOF
         FROM $IMAGE
-        RUN apt install tzdata
         ${PREFETCH_PROD}
         RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
         USER node
@@ -182,7 +192,6 @@ EOF
     if [ "${ARMIMAGE}" ]; then
         docker build -t ${UT_PROJECT}-${IMAGE_TAG}-arm64 . -f-<<EOF
             FROM $ARMIMAGE
-            RUN apt install tzdata
             ${PREFETCH_PROD}
             RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             USER node
