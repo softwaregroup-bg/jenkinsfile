@@ -67,7 +67,7 @@ if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut)-docker.*$ ]]; then
     RUNAPK=$(cat <<END
 USER root
 RUN set -xe\
- && apk add --no-cache libpng-dev optipng make automake bash git openssh python make g++\
+ && apk add --no-cache autoconf libpng-dev optipng make automake bash git openssh python make g++\
  && git --version && bash --version && ssh -V && npm -v && node -v \
  && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
 WORKDIR /app
