@@ -101,6 +101,15 @@ def call(Map params = [:]) {
                             alwaysLinkToLastBuild: true,
                             keepAll: true
                         ])
+                        publishHTML([
+                            reportName: 'Help',
+                            reportTitles: 'Help',
+                            reportDir: '.lint/help',
+                            reportFiles: 'index.html',
+                            allowMissing: true,
+                            alwaysLinkToLastBuild: true,
+                            keepAll: true
+                        ])
                         emailext(
                             mimeType: 'text/html',
                             body: '''<h1>Jenkins build ''' + repoUrl.replaceAll(/^[^\/]*\/|.git$/, "") + ''' ${BUILD_DISPLAY_NAME}</h1>
