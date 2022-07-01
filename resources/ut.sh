@@ -89,6 +89,7 @@ RUN sed -i '/require/ s#^#//#' node_modules/ut-tools/bin/ut-lint.js
 RUN sed -i '/require/ s#^#//#' node_modules/ut-tools/bin/ut-cover.js
 RUN sed -i '/require/ s#^#//#' node_modules/ut-tools/bin/ut-precover.js
 COPY --chown=node:node . .
+USER node
 EOF
 docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls > .lint/npm-ls.txt" || true
 docker run -u node:node -i --rm \
