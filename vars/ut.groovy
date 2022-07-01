@@ -37,7 +37,7 @@ def call(Map params = [:]) {
                 }
                 post {
                     always {
-                        sh 'docker rmi -f $(docker images -q -f "dangling=true") || true'
+                        // sh 'docker rmi -f $(docker images -q -f "dangling=true") || true'
                         script {
                             def files = findFiles(glob:'.lint/result.json')
                             if (files) {
