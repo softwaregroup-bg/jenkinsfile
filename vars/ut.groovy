@@ -9,7 +9,7 @@ def call(Map params = [:]) {
         agent { label 'implementation-slaves' }
         stages {
             stage('indexing') {
-                when {not { triggeredBy 'BranchIndexingCause' }}
+                when { triggeredBy 'BranchIndexingCause' }
                 steps {
                     script {
                         currentBuild.displayName = '#' + currentBuild.number + ' - abort indexing'
@@ -19,7 +19,7 @@ def call(Map params = [:]) {
             }
             stage('build') {
                 // when { not { changelog "^[ci.skip]" }}
-                when { triggeredBy 'BranchIndexingCause' }
+                when { not { triggeredBy 'BranchIndexingCause' } }
                 environment {
                     JOB_TYPE = 'pipeline'
                     UT_DB_PASS = credentials('UT_DB_PASS')
