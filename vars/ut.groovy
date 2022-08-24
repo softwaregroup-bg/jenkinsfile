@@ -9,7 +9,7 @@ def call(Map params = [:]) {
         agent { label 'implementation-slaves' }
         stages {
             stage('indexing') {
-                when { triggeredBy 'BranchIndexingCause' }
+                when {not { triggeredBy 'BranchIndexingCause' }}
                 steps {
                     script {
                         currentBuild.result = 'ABORTED'
