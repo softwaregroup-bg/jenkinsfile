@@ -8,6 +8,15 @@ def call(Map params = [:]) {
     pipeline {
         agent { label 'implementation-slaves' }
         stages {
+            stage('indexing') {
+                when { triggeredBy 'BranchIndexingCause' }
+                steps {
+                    script {
+                        currentBuild.displayName = '#' + currentBuild.number + ' - abort indexing'
+                        currentBuild.result = 'ABORTED'
+                    }
+                }
+            }
             stage('build') {
                 // when { not { changelog "^[ci.skip]" }}
                 when {not { triggeredBy 'BranchIndexingCause' }}
