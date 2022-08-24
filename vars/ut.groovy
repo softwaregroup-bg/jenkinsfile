@@ -12,13 +12,8 @@ def call(Map params = [:]) {
                 when {not { triggeredBy 'BranchIndexingCause' }}
                 steps {
                     script {
-                        try {
-                            echo 'Branch indexing abort'
-                            sh 'exit 1'
-                        }
-                        catch (exc) {
-                            currentBuild.result = 'ABORTED'
-                        }
+                        currentBuild.displayName = '#' + currentBuild.number + ' - abort indexing'
+                        currentBuild.result = 'ABORTED'
                     }
                 }
             }
