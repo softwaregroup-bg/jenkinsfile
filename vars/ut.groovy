@@ -19,7 +19,7 @@ def call(Map params = [:]) {
             }
             stage('build') {
                 // when { not { changelog "^[ci.skip]" }}
-                when { not { triggeredBy 'BranchIndexingCause' } }
+                when {not { triggeredBy 'BranchIndexingCause' }}
                 environment {
                     JOB_TYPE = 'pipeline'
                     UT_DB_PASS = credentials('UT_DB_PASS')
