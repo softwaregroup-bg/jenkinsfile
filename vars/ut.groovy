@@ -11,7 +11,9 @@ def call(Map params = [:]) {
             stage('indexing') {
                 when { triggeredBy 'BranchIndexingCause' }
                 steps {
-                    setBuildResult('ABORTED')
+                    warnError('Branch indexing, skip build', 'ABORTED') {
+                        sh 'exit 1'
+                    }
                 }
             }
             stage('build') {
