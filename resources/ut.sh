@@ -124,6 +124,8 @@ docker run -u node:node -i \
     -e BUILD_CAUSE=$BUILD_CAUSE \
     -e DOCKER_USR=$DOCKER_USR \
     -e DOCKER_PSW=$DOCKER_PSW \
+    -e IMPL_TOOLS_USR=$IMPL_TOOLS_USR \
+    -e IMPL_TOOLS_PSW=$IMPL_TOOLS_PSW \
     -e CHANGE_ID=$CHANGE_ID \
     -e ${UT_PREFIX}_db__create__password=$UT_DB_PASS \
     -e ${UT_PREFIX}_db__connection__encryptionPass="$encryptionPass" \
