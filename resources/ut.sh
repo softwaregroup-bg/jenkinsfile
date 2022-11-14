@@ -178,6 +178,7 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
     docker build -t ${UT_PROJECT}:${IMAGE_TAG} . -f-<<EOF
         FROM ${UT_PROJECT}:${TEST_IMAGE_TAG}
         RUN npm prune --legacy-peer-deps --production
+        RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
 EOF
     docker build -t ${UT_PROJECT}-${IMAGE_TAG}-amd64 . -f-<<EOF
         FROM $IMAGE
@@ -196,9 +197,9 @@ EOF
     if [ "${ARMIMAGE}" ]; then
         docker build -t ${UT_PROJECT}-${IMAGE_TAG}-arm64 . -f-<<EOF
             FROM --platform=linux/arm64 $ARMIMAGE
-            RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             USER node
             COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
+            COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /var/lib/SoftwareGroup /var/lib/SoftwareGroup
             WORKDIR /app
             COPY --chown=node:node dist dist
             COPY --chown=node:node package.json package.json
