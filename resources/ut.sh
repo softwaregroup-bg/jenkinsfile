@@ -175,7 +175,7 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
     TAG=${RELEASE//[\/\\]/-}
     if [ "$TAG" = "master" ]; then TAG="latest"; fi
     IMAGE_TAG=${TAG}-${EXECUTOR_NUMBER}
-    docker buildx build -t ${UT_PROJECT}:${IMAGE_TAG} --platform linux/amd64,linux/arm64 . -f-<<EOF
+    docker build -t ${UT_PROJECT}:${IMAGE_TAG} . -f-<<EOF
         FROM ${UT_PROJECT}:${TEST_IMAGE_TAG}
         RUN npm prune --legacy-peer-deps --production
 EOF
@@ -194,8 +194,8 @@ EOF
 EOF
     echo "$DOCKER_PSW" | docker login -u "$DOCKER_USR" --password-stdin nexus-dev.softwaregroup.com:5001
     if [ "${ARMIMAGE}" ]; then
-        docker buildx build -t ${UT_PROJECT}-${IMAGE_TAG}-arm64 --platform linux/arm64 . -f-<<EOF
-            FROM $ARMIMAGE
+        docker build -t ${UT_PROJECT}-${IMAGE_TAG}-arm64 . -f-<<EOF
+            FROM $ARMIMAGE --platform linux/arm64
             ${PREFETCH_PROD}
             RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             USER node
