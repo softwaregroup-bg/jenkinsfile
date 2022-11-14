@@ -199,7 +199,7 @@ EOF
             ${PREFETCH_PROD}
             RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             USER node
-            COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
+            COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} --platform=$BUILDPLATFORM /app /app
             WORKDIR /app
             COPY --chown=node:node dist dist
             COPY --chown=node:node package.json package.json
