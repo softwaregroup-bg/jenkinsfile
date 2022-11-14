@@ -195,7 +195,7 @@ EOF
     echo "$DOCKER_PSW" | docker login -u "$DOCKER_USR" --password-stdin nexus-dev.softwaregroup.com:5001
     if [ "${ARMIMAGE}" ]; then
         docker build -t ${UT_PROJECT}-${IMAGE_TAG}-arm64 . -f-<<EOF
-            FROM --platform linux/arm64 $ARMIMAGE
+            FROM --platform=linux/arm64 $ARMIMAGE
             ${PREFETCH_PROD}
             RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             USER node
