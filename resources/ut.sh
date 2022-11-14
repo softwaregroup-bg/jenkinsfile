@@ -175,7 +175,7 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
     TAG=${RELEASE//[\/\\]/-}
     if [ "$TAG" = "master" ]; then TAG="latest"; fi
     IMAGE_TAG=${TAG}-${EXECUTOR_NUMBER}
-    docker build -t ${UT_PROJECT}:${IMAGE_TAG} --platform linux/amd64,linux/arm64 . -f-<<EOF
+    docker buildx build -t ${UT_PROJECT}:${IMAGE_TAG} --platform linux/amd64,linux/arm64 . -f-<<EOF
         FROM ${UT_PROJECT}:${TEST_IMAGE_TAG}
         RUN npm prune --legacy-peer-deps --production
 EOF
