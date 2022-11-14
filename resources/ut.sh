@@ -196,7 +196,6 @@ EOF
     if [ "${ARMIMAGE}" ]; then
         docker build -t ${UT_PROJECT}-${IMAGE_TAG}-arm64 . -f-<<EOF
             FROM --platform=linux/arm64 $ARMIMAGE
-            ${PREFETCH_PROD}
             RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             USER node
             COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
