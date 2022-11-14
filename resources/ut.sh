@@ -178,7 +178,7 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
     docker build -t ${UT_PROJECT}:${IMAGE_TAG} . -f-<<EOF
         FROM ${UT_PROJECT}:${TEST_IMAGE_TAG}
         RUN npm prune --legacy-peer-deps --production
-        RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
+        RUN rm -rf /var/lib/SoftwareGroup/*
 EOF
     docker build -t ${UT_PROJECT}-${IMAGE_TAG}-amd64 . -f-<<EOF
         FROM $IMAGE
