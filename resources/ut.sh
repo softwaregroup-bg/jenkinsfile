@@ -175,7 +175,7 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
     TAG=${RELEASE//[\/\\]/-}
     if [ "$TAG" = "master" ]; then TAG="latest"; fi
     IMAGE_TAG=${TAG}-${EXECUTOR_NUMBER}
-    docker build -t ${UT_PROJECT}:${IMAGE_TAG} . -f-<<EOF
+    docker build -t ${UT_PROJECT}:${IMAGE_TAG} --platform linux/amd64,linux/arm64 . -f-<<EOF
         FROM ${UT_PROJECT}:${TEST_IMAGE_TAG}
         RUN npm prune --legacy-peer-deps --production
 EOF
@@ -199,7 +199,7 @@ EOF
             ${PREFETCH_PROD}
             RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
             USER node
-            COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} --platform=$BUILDPLATFORM /app /app
+            COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
             WORKDIR /app
             COPY --chown=node:node dist dist
             COPY --chown=node:node package.json package.json
