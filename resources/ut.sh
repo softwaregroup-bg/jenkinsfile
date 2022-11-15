@@ -180,7 +180,7 @@ if [[ $RELEASE && ${UT_IMPL} ]]; then
         RUN npm prune --legacy-peer-deps --production
         RUN rm -rf /var/lib/SoftwareGroup/*
 EOF
-    docker build -t ${UT_PROJECT}-${IMAGE_TAG}-amd64 . -f-<<EOF
+    docker build -t nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG . -f-<<EOF
         FROM $IMAGE
         ${PREFETCH_PROD}
         RUN mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
@@ -195,7 +195,7 @@ EOF
 EOF
     echo "$DOCKER_PSW" | docker login -u "$DOCKER_USR" --password-stdin nexus-dev.softwaregroup.com:5001
     if [ "${ARMIMAGE}" ]; then
-        docker build -t ${UT_PROJECT}-${IMAGE_TAG}-arm64 . -f-<<EOF
+        docker build -t nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG . -f-<<EOF
             FROM --platform=linux/arm64 $ARMIMAGE
             USER node
             COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
@@ -206,19 +206,17 @@ EOF
             ENTRYPOINT ["node", "index.js"]
             CMD ["server"]
 EOF
-        docker tag ${UT_PROJECT}-${IMAGE_TAG}-amd64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG
-        docker tag ${UT_PROJECT}-${IMAGE_TAG}-arm64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG
         docker push nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG
         docker push nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG
         DOCKER_CLI_EXPERIMENTAL=enabled docker manifest rm nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG || true
         DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG
         DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG --os linux --arch arm64 --variant v8
         DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
-        docker rmi ${UT_PROJECT}:${IMAGE_TAG} ${UT_PROJECT}-${IMAGE_TAG}-amd64 ${UT_PROJECT}-${IMAGE_TAG}-arm64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG
+        docker rmi nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-arm64:$TAG
     else
-        docker tag ${UT_PROJECT}-${IMAGE_TAG}-amd64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
+        docker tag nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
         docker push nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
-        docker rmi ${UT_PROJECT}:${IMAGE_TAG} ${UT_PROJECT}-${IMAGE_TAG}-amd64 nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
+        docker rmi nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}-amd64:$TAG nexus-dev.softwaregroup.com:5001/ut/${UT_PROJECT}:$TAG
     fi
     if [ "${DEPLOY_TOKEN}" ]; then
         docker run -u node:node -i --rm \
