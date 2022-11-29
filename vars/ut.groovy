@@ -6,6 +6,7 @@ def call(Map params = [:]) {
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
     def repoUrl
     pipeline {
+        options { disableConcurrentBuilds abortPrevious: true }
         agent { label 'implementation-slaves' }
         stages {
             stage('indexing') {
