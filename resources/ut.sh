@@ -182,7 +182,7 @@ EOF
     docker build -t ${UT_PROJECT}-${IMAGE_TAG}-amd64 . -f-<<EOF
         FROM $IMAGE
         ${PREFETCH_PROD}
-        RUN mkdir /var/lib/SoftwareGroup && RUN mkdir /var/lib/SoftwareGroup/ut-document && chown -R node:node /var/lib/SoftwareGroup
+        RUN mkdir /var/lib/SoftwareGroup && mkdir /var/lib/SoftwareGroup/ut-document && chown -R node:node /var/lib/SoftwareGroup
         USER node
         COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
         COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /home/node/.cache/ms-playwright /home/node/.cache/ms-playwright
@@ -197,7 +197,7 @@ EOF
         docker build -t ${UT_PROJECT}-${IMAGE_TAG}-arm64 . -f-<<EOF
             FROM $ARMIMAGE
             ${PREFETCH_PROD}
-            RUN mkdir /var/lib/SoftwareGroup && RUN mkdir /var/lib/SoftwareGroup/ut-document && chown -R node:node /var/lib/SoftwareGroup
+            RUN mkdir /var/lib/SoftwareGroup && mkdir /var/lib/SoftwareGroup/ut-document && chown -R node:node /var/lib/SoftwareGroup
             USER node
             COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
             WORKDIR /app
