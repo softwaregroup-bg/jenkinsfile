@@ -123,7 +123,7 @@ docker run -u node:node -i --rm \
     ${UT_PROJECT}:${TEST_IMAGE_TAG} -c "(git checkout -- .dockerignore || true) && npm run jenkins"
 docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.com:5000/softwaregroup/sonar-scanner:3.2.0-alpine \
   -c "sonar-scanner \
-  -Dsonar.host.url=https://sonar.softwaregroup.com/ \
+  -Dsonar.host.url=https://sca.softwaregroup.com/ \
   -Dsonar.projectKey=${UT_PROJECT} \
   -Dsonar.projectName=${UT_PROJECT} \
   -Dsonar.projectVersion=1 \
