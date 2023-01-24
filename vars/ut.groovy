@@ -23,7 +23,7 @@ def call(Map params = [:]) {
                 when {not { triggeredBy 'BranchIndexingCause' }}
                 environment {
                     JOB_TYPE = 'pipeline'
-                    UT_DB_PASS = credentials('UT_DB_PASS')
+                    UT_DB_PASS_TEST = credentials('UT_DB_PASS_TEST')
                     UT_MASTER_KEY = credentials('UT_MASTER_KEY')
                     CHROMATIC_PROJECT_TOKEN = credentials('CHROMATIC_PROJECT_TOKEN')
                     DEPLOY_TOKEN = credentials('DEPLOY_TOKEN')
