@@ -110,7 +110,7 @@ docker run -u node:node -i \
     -e BUILD_ID=$BUILD_ID \
     -e BUILD_NUMBER=$BUILD_NUMBER \
     -e UT_ENV=jenkins \
-    -e UT_DB_PASS=$UT_DB_PASS \
+    -e UT_DB_PASS_TEST=$UT_DB_PASS_TEST \
     -e UT_MASTER_KEY=$UT_MASTER_KEY \
     -e CHROMATIC_PROJECT_TOKEN=$CHROMATIC_PROJECT_TOKEN \
     -e GITLAB_STATUS_TOKEN=$GITLAB_STATUS_TOKEN \
@@ -129,13 +129,13 @@ docker run -u node:node -i \
     -e IMPL_TOOLS_USR=$IMPL_TOOLS_USR \
     -e IMPL_TOOLS_PSW=$IMPL_TOOLS_PSW \
     -e CHANGE_ID=$CHANGE_ID \
-    -e ${UT_PREFIX}_db__create__password=$UT_DB_PASS \
+    -e ${UT_PREFIX}_db__create__password=$UT_DB_PASS_TEST \
     -e ${UT_PREFIX}_db__connection__encryptionPass="$encryptionPass" \
     -e ${UT_PREFIX}_db__connection__database=${UT_MODULE}-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER}${DBSUFFIX} \
-    -e ${UT_PREFIX}_utAudit__db__create__password=$UT_DB_PASS \
+    -e ${UT_PREFIX}_utAudit__db__create__password=$UT_DB_PASS_TEST \
     -e ${UT_PREFIX}_utAudit__db__connection__database=${UT_MODULE}-audit-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER}${DBSUFFIX} \
     -e ${UT_PREFIX}_utHistory__db__connection__database=${UT_MODULE}-history-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER}${DBSUFFIX} \
-    -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
+    -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS_TEST \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     --entrypoint=/bin/bash \
     --name ${UT_PROJECT}-${TEST_IMAGE_TAG} \
