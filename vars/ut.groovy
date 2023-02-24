@@ -116,7 +116,7 @@ def call(Map params = [:]) {
                         publishHTML([
                             reportName: 'Help',
                             reportTitles: 'Help',
-                            reportDir: '.lint/help',
+                            reportDir: 'dist/help',
                             reportFiles: 'index.html',
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
