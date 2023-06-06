@@ -8,6 +8,9 @@ def call(Map params = [:]) {
     pipeline {
         options { disableConcurrentBuilds abortPrevious: true }
         agent { label 'implementation-slaves' }
+        environment {
+            BUILD_DATE = new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        }
         stages {
             stage('indexing') {
                 when { triggeredBy 'BranchIndexingCause' }
