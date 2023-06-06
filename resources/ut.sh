@@ -109,6 +109,7 @@ docker run -u node:node -i \
     -e JOB_NAME=${UT_PROJECT} \
     -e BUILD_ID=$BUILD_ID \
     -e BUILD_NUMBER=$BUILD_NUMBER \
+    -e BUILD_DATE=$BUILD_DATE \
     -e UT_ENV=jenkins \
     -e UT_DB_PASS=$UT_DB_PASS \
     -e UT_MASTER_KEY=$UT_MASTER_KEY \
