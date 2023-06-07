@@ -4,19 +4,6 @@ def call(Map params = [:]) {
     def armimage = params.armimage?:''
     def scanner = [dashboardUrl:'https://sca.softwaregroup.com']
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
-    def isSnapshotRequired(currentBuild, trigger) {
-        def isRequired = false
-        def changeLogSets = currentBuild.rawBuild.changeSets
-        changeLogSets.each { changeLogSet ->
-            for (entry in changeLogSet.getItems()) {
-                if (entry.getMsg().contains(trigger)) {
-                    isRequired = true
-                    return
-                }
-            }
-        }
-        return isRequired
-    }
     def repoUrl
     pipeline {
         options { disableConcurrentBuilds  }
@@ -171,4 +158,18 @@ ${FILE,path=".lint/test.txt"}
             }
         }
     }
+}
+
+def containsMsg(currentBuild, msg) {
+    def isRequired = false
+    def changeLogSets = currentBuild.rawBuild.changeSets
+    changeLogSets.each { changeLogSet ->
+        for (entry in changeLogSet.getItems()) {
+            if (entry.getMsg().contains(msg)) {
+                isRequired = true
+                return
+            }
+        }
+    }
+    return isRequired
 }
