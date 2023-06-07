@@ -4,9 +4,11 @@ def call(Map params = [:]) {
     def armimage = params.armimage?:''
     def scanner = [dashboardUrl:'https://sca.softwaregroup.com']
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
-    def skip = false
+    def skip = true
+    def msg = ''
     if(currentBuild && !currentBuild.changeSets.isEmpty()) {
-        skip = currentBuild.changeSets.first().getItems()[0].getMsg().contains('[ci-skip]')
+        msg = currentBuild.changeSets.first().getItems()[0].getMsg()
+        skip = msg.contains('[ci-skip]')
     }
     def repoUrl
     pipeline {
@@ -18,7 +20,7 @@ def call(Map params = [:]) {
         stages {
             stage('echo') {
                 steps {
-                    echo author
+                    echo msg
                 }
             }
             stage('indexing') {
