@@ -6,7 +6,7 @@ def call(Map params = [:]) {
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
     def author = ""
     if(currentBuild && !currentBuild.changeSets.isEmpty()) {
-        author = currentBuild.changeSets.first().getItems()[0].getAuthor().getProperty(hudson.tasks.Mailer.UserProperty.class).getEmailAddress()
+        author = currentBuild.changeSets.first().getItems()[0].authorEmail
     }
     def repoUrl
     pipeline {
