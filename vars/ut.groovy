@@ -6,7 +6,7 @@ def call(Map params = [:]) {
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
     def repoUrl
     pipeline {
-        options { disableConcurrentBuilds  }
+        options { disableConcurrentBuilds abortPrevious: false }
         agent { label 'implementation-slaves' }
         environment {
             BUILD_DATE = new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'")
