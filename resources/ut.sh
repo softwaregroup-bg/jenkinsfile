@@ -131,10 +131,13 @@ docker run -u node:node -i \
     -e IMPL_TOOLS_PSW=$IMPL_TOOLS_PSW \
     -e CHANGE_ID=$CHANGE_ID \
     -e ${UT_PREFIX}_db__create__password=$UT_DB_PASS \
+    -e ${UT_PREFIX}_db__connection__server=$UT_DB_SERVER \
     -e ${UT_PREFIX}_db__connection__encryptionPass="$encryptionPass" \
     -e ${UT_PREFIX}_db__connection__database=${UT_MODULE}-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER}${DBSUFFIX} \
     -e ${UT_PREFIX}_utAudit__db__create__password=$UT_DB_PASS \
+    -e ${UT_PREFIX}_utAudit__db__connection__server=$UT_DB_SERVER \
     -e ${UT_PREFIX}_utAudit__db__connection__database=${UT_MODULE}-audit-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER}${DBSUFFIX} \
+    -e ${UT_PREFIX}_utHistory__db__connection__server=$UT_DB_SERVER \
     -e ${UT_PREFIX}_utHistory__db__connection__database=${UT_MODULE}-history-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER}${DBSUFFIX} \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \

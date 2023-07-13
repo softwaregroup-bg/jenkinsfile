@@ -1,6 +1,7 @@
 def call(Map params = [:]) {
     def buildImage = params.buildImage?:'nexus-dev.softwaregroup.com:5000/softwaregroup/ut-gallium'
     def image = params.image?:'nexus-dev.softwaregroup.com:5000/softwaregroup/deploy-gallium'
+    def utDBServer = params.utDBServer?:'infradb14'
     def armimage = params.armimage?:''
     def scanner = [dashboardUrl:'https://sca.softwaregroup.com']
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
@@ -41,6 +42,7 @@ def call(Map params = [:]) {
                     IMAGE = "${image}"
                     ARMIMAGE = "${armimage}"
                     SONAR_COVERAGE_EXCLUSIONS = "${sonarCoverageExclusions}"
+                    UT_DB_SERVER = "${utDBServer}"
                 }
                 steps {
                     // sh 'printenv | sort'
