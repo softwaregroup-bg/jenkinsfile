@@ -165,7 +165,7 @@ docker run --entrypoint=/bin/sh -i --rm -v $(pwd):/app nexus-dev.softwaregroup.c
   -Dsonar.tests=. \
   -Dsonar.test.inclusions=test/**/*.js,**/*.test.js,**/*.test.ts,**/*.test.tsx \
   -Dsonar.test.exclusions=node_modules/**/*,coverage/**/*,dist/**/* \
-  -Dsonar.coverage.exclusions=ui/**/* \
+  -Dsonar.coverage.exclusions=${SONAR_COVERAGE_EXCLUSIONS} \
   ${SONAR_BRANCH} \
   -Dsonar.login=${SONAR_SCA_USR} \
   -Dsonar.password=${SONAR_SCA_PSW} \

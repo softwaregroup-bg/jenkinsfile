@@ -4,6 +4,7 @@ def call(Map params = [:]) {
     def armimage = params.armimage?:''
     def scanner = [dashboardUrl:'https://sca.softwaregroup.com']
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
+    def sonarCoverageExclusions = params.sonarCoverageExclusions?:'ui/**/*'
     def repoUrl
     pipeline {
         options { disableConcurrentBuilds abortPrevious: true }
@@ -39,6 +40,7 @@ def call(Map params = [:]) {
                     BUILD_IMAGE = "${buildImage}"
                     IMAGE = "${image}"
                     ARMIMAGE = "${armimage}"
+                    SONAR_COVERAGE_EXCLUSIONS = "${sonarCoverageExclusions}"
                 }
                 steps {
                     // sh 'printenv | sort'
