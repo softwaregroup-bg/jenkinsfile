@@ -4,10 +4,14 @@ def call(Map params = [:]) {
     def armimage = params.armimage?:''
     def scanner = [dashboardUrl:'https://sca.softwaregroup.com']
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'
+    def sonarCoverageExclusions = params.sonarCoverageExclusions?:'ui/**/*'
     def repoUrl
     pipeline {
         options { disableConcurrentBuilds abortPrevious: true }
         agent { label 'implementation-slaves' }
+        environment {
+            BUILD_DATE = new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        }
         stages {
             stage('indexing') {
                 when { triggeredBy 'BranchIndexingCause' }
@@ -23,7 +27,7 @@ def call(Map params = [:]) {
                 when {not { triggeredBy 'BranchIndexingCause' }}
                 environment {
                     JOB_TYPE = 'pipeline'
-                    UT_DB_PASS_TEST = credentials('UT_DB_PASS_TEST')
+                    UT_DB_PASS = credentials('UT_DB_PASS')
                     UT_MASTER_KEY = credentials('UT_MASTER_KEY')
                     CHROMATIC_PROJECT_TOKEN = credentials('CHROMATIC_PROJECT_TOKEN')
                     DEPLOY_TOKEN = credentials('DEPLOY_TOKEN')
@@ -36,6 +40,7 @@ def call(Map params = [:]) {
                     BUILD_IMAGE = "${buildImage}"
                     IMAGE = "${image}"
                     ARMIMAGE = "${armimage}"
+                    SONAR_COVERAGE_EXCLUSIONS = "${sonarCoverageExclusions}"
                 }
                 steps {
                     // sh 'printenv | sort'
@@ -63,7 +68,7 @@ def call(Map params = [:]) {
                                 scanner = readProperties file: files[0].path, defaults: [dashboardUrl:'https://sca.softwaregroup.com']
                             }
                         }
-                        recordIssues enabledForFailure: true, ignoreFailedBuilds: false, tools: [checkStyle(pattern: '.lint/lint*.xml')]
+                        recordIssues enabledForFailure: true, ignoreFailedBuilds: false, tools: [checkStyle(pattern: '.lint/lint*.xml'), junitParser(pattern: '.lint/jlint*.xml')]
                         step([$class: "TapPublisher", testResults: ".lint/tap.txt", verbose: false, enableSubtests: true, planRequired: false])
                         cobertura coberturaReportFile: 'coverage/cobertura-coverage.xml', failNoReports: false
                         perfReport sourceDataFiles: '.lint/load/*.csv', failBuildIfNoResultFile: false, compareBuildPrevious: true
@@ -116,7 +121,7 @@ def call(Map params = [:]) {
                         publishHTML([
                             reportName: 'Help',
                             reportTitles: 'Help',
-                            reportDir: '.lint/help',
+                            reportDir: 'dist/help',
                             reportFiles: 'index.html',
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
