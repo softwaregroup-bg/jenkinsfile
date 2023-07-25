@@ -104,6 +104,8 @@ docker run -u node:node -i \
     -v "$(pwd)/dist:/app/dist" \
     -v "$(pwd)/coverage:/app/coverage" \
     -v "node_modules_cache:/app/node_modules/.cache" \
+    -c "node -v" \
+    -c "npm -v" \
     -e TAP_JOBS=4 \
     -e JOB_TYPE=$JOB_TYPE \
     -e JOB_NAME=${UT_PROJECT} \
