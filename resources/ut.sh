@@ -91,7 +91,9 @@ COPY --chown=node:node package.json package.json
 # RUN --mount=type=cache,target=/home/node/.npm,mode=0777,uid=1000,gid=1000 \ # https://community.sonatype.com/t/cannot-install-with-registry-npm-group/6279
 RUN mkdir -p /app/node_modules/.cache \
   && npm --legacy-peer-deps install \
-  && npm config delete cache
+  && npm config delete cache \
+  && node -v \
+  && npm -v
 COPY --chown=node:node . .
 EOF
 docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls -a > .lint/npm-ls.txt" || true
@@ -104,8 +106,6 @@ docker run -u node:node -i \
     -v "$(pwd)/dist:/app/dist" \
     -v "$(pwd)/coverage:/app/coverage" \
     -v "node_modules_cache:/app/node_modules/.cache" \
-    -c "node -v" \
-    -c "npm -v" \
     -e TAP_JOBS=4 \
     -e JOB_TYPE=$JOB_TYPE \
     -e JOB_NAME=${UT_PROJECT} \
