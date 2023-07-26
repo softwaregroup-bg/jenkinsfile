@@ -92,8 +92,8 @@ COPY --chown=node:node package.json package.json
 RUN mkdir -p /app/node_modules/.cache \
   && npm --legacy-peer-deps install \
   && npm config delete cache \
-  && echo NODE_VERSION=$NODE_VERSION \
-  && echo NPM_VERSION=$NPM_VERSION
+  && echo NODE_VERSION='node -v' \
+  && echo NPM_VERSION='npm -v'
 COPY --chown=node:node . .
 EOF
 docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls -a > .lint/npm-ls.txt" || true
