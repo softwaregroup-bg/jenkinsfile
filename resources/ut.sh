@@ -12,6 +12,8 @@ UT_MODULE=
 SONAR_PREFIX=
 LERNA=
 DBSUFFIX=
+NODE_VERSION=
+NPM_VERSION=
 if [[ ${CHANGE_ID} ]]; then
     DBSUFFIX=-${CHANGE_ID}
 fi
@@ -69,7 +71,7 @@ if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut|node)-(docker|gallium).*$ ]]; the
     RUNAPK=$(cat <<END
 RUN set -xe\
  && apt install git openssh-client python3 make g++ tzdata \
- && git --version && bash --version && ssh -V && yarn -v \
+ && git --version && bash --version && ssh -V && yarn -v && NODE_VERSION=$(node -v) && NPM_VERSION=$(npm -v) \
  && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
 WORKDIR /app
 RUN chown -R node:node /app
@@ -84,6 +86,8 @@ docker build -t ${UT_PROJECT}:${TEST_IMAGE_TAG} . -f-<<EOF
 # syntax=docker/dockerfile:experimental
 FROM $BUILD_IMAGE
 $RUNAPK
+$NODE_VERSION
+$NPM_VERSION
 ${NPMRC}
 ${LERNA}
 ${PREFETCH}
@@ -92,8 +96,8 @@ COPY --chown=node:node package.json package.json
 RUN mkdir -p /app/node_modules/.cache \
   && npm --legacy-peer-deps install \
   && npm config delete cache \
-  && node -v \
-  && npm -v
+  && echo NODE_VERSION=$NODE_VERSION \
+  && echo NPM_VERSION=$NPM_VERSION
 COPY --chown=node:node . .
 EOF
 docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls -a > .lint/npm-ls.txt" || true
