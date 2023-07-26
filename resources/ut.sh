@@ -69,7 +69,7 @@ if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut|node)-(docker|gallium).*$ ]]; the
     RUNAPK=$(cat <<END
 RUN set -xe\
  && apt install git openssh-client python3 make g++ tzdata \
- && git --version && bash --version && ssh -V && node -v && npm -v && yarn -v && NODE_VERSION='node -v' && NPM_VERSION='npm -v' \
+ && git --version && bash --version && ssh -V && node -v && npm -v && yarn -v && echo NODE_VERSION=$(node -v) && echo NPM_VERSION=$(npm -v) \
  && mkdir /var/lib/SoftwareGroup && chown -R node:node /var/lib/SoftwareGroup
 WORKDIR /app
 RUN chown -R node:node /app
@@ -92,8 +92,8 @@ COPY --chown=node:node package.json package.json
 RUN mkdir -p /app/node_modules/.cache \
   && npm --legacy-peer-deps install \
   && npm config delete cache \
-  && node -v \
-  && npm -v \
+#  && node -v \
+#  && npm -v \
 #  && echo NODE_VERSION=$(node -v) \
 #  && echo NPM_VERSION=$(npm -v)
 COPY --chown=node:node . .
