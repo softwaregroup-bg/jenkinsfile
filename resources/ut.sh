@@ -94,7 +94,7 @@ RUN mkdir -p /app/node_modules/.cache \
   && npm config delete cache
 COPY --chown=node:node . .
 EOF
-docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c "npm ls -a > .lint/npm-ls.txt" || true
+docker run -u node:node -i --rm -v "$(pwd)/.lint:/app/.lint" ${UT_PROJECT}:${TEST_IMAGE_TAG} /bin/sh -c " { node -v; npm -v; npm ls -a; } > .lint/npm-ls.txt" || true
 docker run -u node:node -i \
     -v ~/.ssh:/home/node/.ssh:ro \
     -v ~/.npmrc:/home/node/.npmrc:ro \
