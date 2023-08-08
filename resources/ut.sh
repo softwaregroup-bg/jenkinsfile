@@ -137,6 +137,9 @@ docker run -u node:node -i \
     -e ${UT_PREFIX}_utAudit__db__connection__database=${UT_MODULE}-audit-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER}${DBSUFFIX} \
     -e ${UT_PREFIX}_utHistory__db__connection__database=${UT_MODULE}-history-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER}${DBSUFFIX} \
     -e ${UT_PREFIX}_utHistory__db__create__password=$UT_DB_PASS \
+    -e ${UT_PREFIX}_utAzercell__dbReport__create__password=$UT_DB_PASS \
+    -e ${UT_PREFIX}_utAzercell__dbReport__connection__encryptionPass="$encryptionPass" \
+    -e ${UT_PREFIX}_utAzercell__dbReport__connection__database=${UT_MODULE}-${UT_PROJECT}-${BRANCH_NAME//[\/\\]/-}-${BUILD_NUMBER}${DBSUFFIX} \
     -e TAP_TIMEOUT=$TAP_TIMEOUT \
     --entrypoint=/bin/bash \
     --name ${UT_PROJECT}-${TEST_IMAGE_TAG} \
