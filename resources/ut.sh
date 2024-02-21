@@ -15,6 +15,7 @@ DBSUFFIX=
 if [[ ${CHANGE_ID} ]]; then
     DBSUFFIX=-${CHANGE_ID}
 fi
+echo "$DOCKER_PSW" | docker login -u "$DOCKER_USR" --password-stdin nexus-dev.softwaregroup.com:5000
 if [[ ${UT_PROJECT} =~ impl-(.*) ]]; then
     # SONAR_PREFIX=ut5/
     UT_IMPL=${BASH_REMATCH[1]}
