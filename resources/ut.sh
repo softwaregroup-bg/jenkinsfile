@@ -130,6 +130,10 @@ docker run -u node:node -i \
     -e IMPL_TOOLS_URL=$IMPL_TOOLS_URL \
     -e IMPL_TOOLS_USR=$IMPL_TOOLS_USR \
     -e IMPL_TOOLS_PSW=$IMPL_TOOLS_PSW \
+    -e IMPL_TOOLS_URL=$IMPL_TOOLS_URL \
+    -e IMPL_TOOLS_LICENSE_URL=$IMPL_TOOLS_LICENSE_URL \
+    -e IMPL_TOOLS_LICENSE_USR=$IMPL_TOOLS_LICENSE_USR \
+    -e IMPL_TOOLS_LICENSE_PSW=$IMPL_TOOLS_LICENSE_PSW \
     -e CHANGE_ID=$CHANGE_ID \
     -e ${UT_PREFIX}_db__create__password=$UT_DB_PASS \
     -e ${UT_PREFIX}_db__connection__encryptionPass="$encryptionPass" \
