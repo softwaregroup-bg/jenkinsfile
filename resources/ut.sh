@@ -147,11 +147,7 @@ docker run -u node:node -i \
     ${UT_PROJECT}:${TEST_IMAGE_TAG} -c "(git checkout -- .dockerignore || true) && npm run jenkins" \
     || (docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG} && false)
 docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app/package.json package.json
-docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app app
-ls -la ./app
-ls -la app
-ls -la
-rm -rf ./app/node_modules ./app/.git
+docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app/ut-external app/ut-external
 ls -la ./app
 ls -la app
 ls -la
