@@ -147,13 +147,13 @@ docker run -u node:node -i \
     ${UT_PROJECT}:${TEST_IMAGE_TAG} -c "(git checkout -- .dockerignore || true) && npm run jenkins" \
     || (docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG} && false)
 docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app/package.json package.json
+
+# this is used for license module below =====
 rm -rf app
 docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app app
-# docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app/ut-external app/ut-external
 rm -rf app/node_modules app/.git
-ls -la ./app
-ls -la app
-ls -la
+# this is used for license module above =====
+
 docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG}
 
 SONAR_BRANCH=-Dsonar.branch.name=${GIT_BRANCH#origin/}
@@ -199,7 +199,11 @@ EOF
         COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
         COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /home/node/.cache/ms-playwright /home/node/.cache/ms-playwright
         WORKDIR /app
+        
+        # this is used for license module below =====
         COPY --chown=node:node app/. .
+        # this is used for license module above =====
+        
         COPY --chown=node:node dist dist
         COPY --chown=node:node package.json package.json
         ENTRYPOINT ["node", "index.js"]
