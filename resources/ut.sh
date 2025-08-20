@@ -192,8 +192,9 @@ EOF
         COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
         COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /home/node/.cache/ms-playwright /home/node/.cache/ms-playwright
         WORKDIR /app
-        COPY --chown=node:node dist dist
-        COPY --chown=node:node package.json package.json
+        COPY --chown=node:node . .
+        # COPY --chown=node:node dist dist
+        # COPY --chown=node:node package.json package.json
         ENTRYPOINT ["node", "index.js"]
         CMD ["server"]
 EOF
@@ -204,7 +205,7 @@ EOF
             ${PREFETCH_PROD}
             RUN mkdir /var/lib/SoftwareGroup && mkdir /var/lib/SoftwareGroup/ut-document && chown -R node:node /var/lib/SoftwareGroup
             USER node
-            COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
+            # COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
             WORKDIR /app
             COPY --chown=node:node dist dist
             COPY --chown=node:node package.json package.json
