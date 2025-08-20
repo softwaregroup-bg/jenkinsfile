@@ -148,6 +148,7 @@ docker run -u node:node -i \
     || (docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG} && false)
 docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app/package.json package.json
 docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app app
+rm -rf ./app/node_modules ./app/.git
 docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG}
 
 SONAR_BRANCH=-Dsonar.branch.name=${GIT_BRANCH#origin/}
