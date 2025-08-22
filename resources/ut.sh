@@ -149,9 +149,11 @@ docker run -u node:node -i \
 docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app/package.json package.json
 
 # this is used for license module below =====
-rm -rf app
-docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app app
-rm -rf app/node_modules app/.git
+if jq -e '.scripts.license' package.json > /dev/null; then
+    rm -rf app
+    docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app app
+    rm -rf app/node_modules app/.git
+fi
 # this is used for license module above =====
 
 docker rm ${UT_PROJECT}-${TEST_IMAGE_TAG}
@@ -201,7 +203,9 @@ EOF
         WORKDIR /app
         
         # this is used for license module below =====
-        COPY --chown=node:node app/. .
+        if jq -e '.scripts.license' package.json > /dev/null; then
+            COPY --chown=node:node app/. .
+        fi
         # this is used for license module above =====
         
         COPY --chown=node:node dist dist
