@@ -203,9 +203,13 @@ EOF
         WORKDIR /app
         
         # this is used for license module below =====
-        if jq -e '.scripts.license' package.json > /dev/null; then
-            COPY --chown=node:node app/. .
-        fi
+        # stage the app copy into license_app
+        COPY --chown=node:node app/. license_app/
+        
+        # check package.json for license script
+        RUN if jq -e '.scripts.license' package.json > /dev/null; then \
+              cp -r license_app/. app/; \
+            fi && rm -rf license_app
         # this is used for license module above =====
         
         COPY --chown=node:node dist dist
