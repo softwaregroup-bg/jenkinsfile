@@ -1,4 +1,7 @@
 #!/bin/bash
+# this is used for license module below =====
+rm -rf app
+# this is used for license module below =====
 set -x
 set -e
 UT_PROJECT=`git config --get remote.origin.url | sed -n -r 's/.*\/(ut-.*|impl-.*|.*-ut).git/\1/p'`
@@ -149,7 +152,7 @@ docker run -u node:node -i \
 docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app/package.json package.json
 
 # this is used for license module below =====
-rm -rf app
+# rm -rf app # this will be move somewhere above
 docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app app
 rm -rf app/node_modules app/.git
 # this is used for license module above =====
