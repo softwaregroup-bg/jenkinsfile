@@ -1,7 +1,4 @@
 #!/bin/bash
-# this is used for license module below =====
-rm -rf app
-# this is used for license module below =====
 set -x
 set -e
 UT_PROJECT=`git config --get remote.origin.url | sed -n -r 's/.*\/(ut-.*|impl-.*|.*-ut).git/\1/p'`
@@ -68,6 +65,12 @@ do
     fi
     mkdir $item
 done
+
+# Cleanup licensed application leftovers
+if [ -d app ]
+then
+    rm -rf app
+fi
 
 if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut|node)-(docker|gallium).*$ ]]; then
     RUNAPK=$(cat <<END
@@ -152,7 +155,6 @@ docker run -u node:node -i \
 docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app/package.json package.json
 
 # this is used for license module below =====
-# rm -rf app # this will be move somewhere above
 docker cp ${UT_PROJECT}-${TEST_IMAGE_TAG}:/app app
 rm -rf app/node_modules app/.git
 # this is used for license module above =====
@@ -212,6 +214,13 @@ EOF
         ENTRYPOINT ["node", "index.js"]
         CMD ["server"]
 EOF
+
+    # Cleanup licensed application
+    if [ -d app ]
+    then
+        rm -rf app
+    fi
+
     echo "$DOCKER_PSW" | docker login -u "$DOCKER_USR" --password-stdin nexus-dev.softwaregroup.com:5001
     if [ "${ARMIMAGE}" ]; then
         docker build -t ${UT_PROJECT}-${IMAGE_TAG}-arm64 . -f-<<EOF
