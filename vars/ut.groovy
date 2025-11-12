@@ -1,6 +1,6 @@
 def call(Map params = [:]) {
-    def buildImage = params.buildImage?:'nexus-dev.softwaregroup.com:5000/softwaregroup/ut-gallium'
-    def image = params.image?:'nexus-dev.softwaregroup.com:5000/softwaregroup/deploy-gallium'
+    def buildImage = params.buildImage?:'nexus-dev.softwaregroup.com:5000/softwaregroup/ut-jod'
+    def image = params.image?:'nexus-dev.softwaregroup.com:5000/softwaregroup/deploy-jod'
     def armimage = params.armimage?:''
     def scanner = [dashboardUrl:'https://sca.softwaregroup.com']
     def agentLabel = (env.JOB_NAME.substring(0,3) == 'ut-') ? 'ut5-slaves' : 'implementation-slaves'

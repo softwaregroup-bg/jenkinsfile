@@ -8,12 +8,12 @@ in the root of your project with the following contents:
 Use this to build modules (`ut-*`):
 
 ```groovy
-library identifier: 'jenkinsfile@gallium', retriever: modernSCM([
+library identifier: 'jenkinsfile@jod', retriever: modernSCM([
     $class: 'GitSCMSource',
     remote: 'https://github.com/softwaregroup-bg/jenkinsfile.git'
 ])
 
-ut buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/ut-gallium'
+ut buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/ut-jod'
 ```
 
 ## For implementations
@@ -21,10 +21,10 @@ ut buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/ut-gallium'
 Use this to build implementations (`impl-*`):
 
 ```groovy
-library identifier: 'jenkinsfile@gallium', retriever: modernSCM([
+library identifier: 'jenkinsfile@jod', retriever: modernSCM([
     $class: 'GitSCMSource',
     remote: 'https://github.com/softwaregroup-bg/jenkinsfile.git'
 ])
 
-ut buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/impl-gallium'
+ut buildImage: 'nexus-dev.softwaregroup.com:5000/softwaregroup/impl-jod'
 ```

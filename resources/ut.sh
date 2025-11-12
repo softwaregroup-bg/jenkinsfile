@@ -21,14 +21,14 @@ if [[ ${UT_PROJECT} =~ impl-(.*) ]]; then
     UT_IMPL=${BASH_REMATCH[1]}
     UT_MODULE=${UT_IMPL}
     UT_PREFIX=ut_${UT_IMPL//[-\/\\]/_}_jenkins
-    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/impl-gallium
+    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/impl-jod
 fi
 if [[ ${UT_PROJECT} =~ ut-(.*) ]]; then
     # SONAR_PREFIX=ut5impl/
     UT_MODULE=${BASH_REMATCH[1]}
     UT_PREFIX=ut_${BASH_REMATCH[1]//[-\/\\]/_}_jenkins
-    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/node-gallium
-    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/ut-gallium
+    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/node-jod
+    docker pull nexus-dev.softwaregroup.com:5000/softwaregroup/ut-jod
 fi
 [[ ${GIT_BRANCH} =~ master|(major|minor|patch|hotfix)/[^\/]*$ ]] || true && RELEASE=${BASH_REMATCH[0]}
 # add origin/ if missing
@@ -72,7 +72,7 @@ then
     rm -rf app
 fi
 
-if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut|node)-(docker|gallium).*$ ]]; then
+if [[ ! $BUILD_IMAGE =~ softwaregroup/(impl|ut|node)-(docker|jod).*$ ]]; then
     RUNAPK=$(cat <<END
 RUN set -xe\
  && apt install git openssh-client python3 make g++ tzdata \
