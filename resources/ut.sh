@@ -202,7 +202,7 @@ EOF
         RUN mkdir /var/lib/SoftwareGroup && mkdir /var/lib/SoftwareGroup/ut-document && chown -R node:node /var/lib/SoftwareGroup
         USER node
         COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /app /app
-        COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /home/node/.cache/ms-playwright /home/node/.cache/ms-playwright
+        # COPY --chown=node:node --from=${UT_PROJECT}:${IMAGE_TAG} /home/node/.cache/ms-playwright /home/node/.cache/ms-playwright
         WORKDIR /app
         
         # this is used for license module below =====
